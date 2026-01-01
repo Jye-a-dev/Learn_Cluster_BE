@@ -1,0 +1,147 @@
+//chung 
+
+# Checkout main branch
+git checkout main
+# Cập nhật remote mới nhất
+git fetch origin
+git pull origin main
+---
+//Client
+# Tạo branch mới từ main
+git checkout -b client
+# Chỉ giữ folder client, giữ lịch sử
+git filter-repo --path client --path-rename client/:client/
+# Push branch lên remote
+git push origin client
+---
+//Server
+# Quay lại main
+git checkout main
+# Tạo branch mới
+git checkout -b server
+# Chỉ giữ folder server, giữ lịch sử
+git filter-repo --path server --path-rename server/:server/
+# Push branch lên remote
+git push origin server
+
+Ideal: 
+# Learn Cluster – Hệ thống quản lý học tập & study date thông minh
+
+---
+
+## 1. Vai trò & quyền hạn
+
+| Role               | Quyền chính                                                                                                                            |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Admin**          | Quản lý toàn hệ thống: CRUD user, role, khóa học, study date; duyệt / kiểm duyệt nội dung; thống kê toàn hệ thống; phân quyền nâng cao |
+| **Moderator**      | Kiểm duyệt nội dung do GV / SV tạo; xử lý báo cáo vi phạm; hạn chế quyền truy cập SV; có thể là Teacher hoặc TA được Admin cấp         |
+| **Teacher (GV)**   | Tạo & quản lý khóa học, bài học, study date; chấm điểm & nhận xét; xem thống kê lớp; có thể kiêm Moderator                             |
+| **TA (Trợ giảng)** | Hỗ trợ lớp: quản lý study date, chấm bài, theo dõi tiến độ SV; có thể là Moderator nếu được cấp quyền                                  |
+| **Student (SV)**   | Tham gia khóa học, study date; nộp bài; theo dõi tiến độ; bookmark / ghi chú; feedback & đánh giá; nhận badges / achievements          |
+
+---
+
+## 2. Core Feature: Khóa học (Course)
+
+### CRUD khóa học
+
+- Thông tin: tên, mô tả, mục tiêu, thời lượng, trạng thái (draft / public / closed)
+- Nội dung: Chương → Bài học (video / pdf / text)
+- Đăng ký học: enroll / hủy, giới hạn số SV
+- Theo dõi tiến độ: % bài học đã học
+
+### Bài tập & điểm
+
+- Tạo bài tập (file / text), deadline
+- Nộp bài: file / text trực tiếp
+- Chấm điểm + nhận xét
+- Feedback từ SV về bài học / khóa học
+
+### Chức năng nâng cao “ăn điểm”
+
+- Bookmark bài học, tạo notes / ghi chú cá nhân
+- Đề xuất bài học / khóa học tiếp theo dựa trên tiến độ
+- Achievement / badge khi hoàn thành bài học / course
+
+---
+
+## 3. Study Date (tích hợp với khóa học)
+
+- Tạo study date theo khóa học
+- Chọn bài học / bài tập cần ôn
+- Lịch + địa điểm / link online
+- Join / Leave study date
+- Chat nhóm trong buổi học
+- Đánh giá hiệu quả buổi học
+- Thống kê tham gia & hiệu quả từng study date
+
+### Tích hợp với role
+
+- **Teacher**: tạo, quản lý, chấm điểm
+- **TA**: hỗ trợ quản lý, nhắc nhở SV, chấm bài
+- **Moderator**: kiểm duyệt nội dung, xử lý báo cáo vi phạm
+
+---
+
+## 4. Hệ thống thông báo & lịch
+
+- **Lịch cá nhân**: tổng hợp course + study date
+- **Thông báo / Notification**:
+  - Nhắc nhở deadline, study date, chat mới
+  - Cảnh báo vi phạm (Moderator/Admin)
+- Đồng bộ lịch & study date theo user
+
+---
+
+## 5. Thống kê & báo cáo
+
+| User                  | Thống kê                                                                      |
+| --------------------- | ----------------------------------------------------------------------------- |
+| **SV**                | Tiến độ khóa học, % hoàn thành bài học, điểm trung bình bài tập               |
+| **Teacher / TA**      | Hiệu quả lớp, study date hiệu quả, điểm trung bình, tỉ lệ hoàn thành lớp      |
+| **Admin / Moderator** | Thống kê toàn hệ thống, khóa học phổ biến, hiệu suất Teacher, báo cáo vi phạm |
+
+---
+
+## 6. CRUD tổng quát (Entities)
+
+- User, Role, Permission
+- Course, Chapter, Lesson
+- Enrollment
+- Assignment, Submission, Grade
+- StudyDate, Participant
+- Message, Notification
+
+---
+
+## 7. Cross-role / chức năng mở rộng
+
+- Chat & Forum nội bộ (course / study date)
+- Bookmark, Notes, Feedback, Rating
+- Export / Download dữ liệu (point, báo cáo)
+- Achievements / Badges (gamification)
+- Tìm kiếm / lọc: khóa học, study date theo môn / thời gian
+- Quyền riêng tư: public / course-only
+
+---
+
+## 8. Demo flow (dễ bảo vệ)
+
+1. Teacher tạo khóa học
+2. SV đăng ký khóa học
+3. SV tạo study date trước deadline
+4. Nhóm học + chat trong study date
+5. Nộp bài tập / chấm điểm (TA / Teacher)
+6. Teacher/Moderator kiểm duyệt nội dung nếu cần
+7. Xem tiến độ & thống kê lớp / cá nhân
+8. Badge / achievement hiển thị với SV
+
+---
+
+## 9. Gợi ý “ăn điểm” khi demo
+
+- Thống kê tiến độ & hiệu quả study date (biểu đồ trực quan)
+- Lịch cá nhân + nhắc nhở deadline (UI đẹp, trực quan)
+- Chat study date + nộp bài trong một workflow liền mạch
+- Moderator/Teacher xử lý báo cáo vi phạm / kiểm duyệt nội dung
+- Badge / achievement gamification tăng tính tương tác
