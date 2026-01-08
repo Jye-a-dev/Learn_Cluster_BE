@@ -9,7 +9,7 @@ export const createAssignmentSchema = Joi.object({
 	deadline: Joi.date().optional().allow(null),
 });
 
-// ===== UPDATE ASSIGNMENT =====
+// ===== UPDATE / PATCH ASSIGNMENT =====
 export const updateAssignmentSchema = Joi.object({
 	course_id: Joi.number().integer().optional(),
 	title: Joi.string().optional().allow(null, ""),
@@ -18,7 +18,20 @@ export const updateAssignmentSchema = Joi.object({
 	deadline: Joi.date().optional().allow(null),
 }).min(1);
 
-// ===== GET / DELETE ASSIGNMENT BY ID =====
-export const idParamSchema = Joi.object({
+// ===== PARAM: ASSIGNMENT ID =====
+export const assignmentIdParamSchema = Joi.object({
 	id: Joi.number().integer().required(),
+});
+
+// ===== PARAM: COURSE ID =====
+export const courseIdParamSchema = Joi.object({
+	courseId: Joi.number().integer().required(),
+});
+
+// ===== QUERY ASSIGNMENTS =====
+export const queryAssignmentsSchema = Joi.object({
+	course_id: Joi.number().integer().optional(),
+	page: Joi.number().integer().min(1).optional(),
+	limit: Joi.number().integer().min(1).max(100).optional(),
+	deadline_before: Joi.date().optional(),
 });

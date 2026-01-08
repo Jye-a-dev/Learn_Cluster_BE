@@ -27,6 +27,18 @@ export const AchievementModel = {
 		return (result as any).insertId;
 	},
 
+	async bulkCreate(achievements: Partial<Achievement>[]): Promise<void> {
+		const values = achievements.map((a) => [
+			a.user_id,
+			a.name,
+			a.description || null,
+		]);
+		await pool.query(
+			"INSERT INTO achievements (user_id, name, description) VALUES ?",
+			[values]
+		);
+	},
+
 	async update(id: number, data: Partial<Achievement>): Promise<void> {
 		const fields = Object.keys(data)
 			.map((k) => `${k} = ?`)
@@ -37,6 +49,10 @@ export const AchievementModel = {
 
 	async delete(id: number): Promise<void> {
 		await pool.query("DELETE FROM achievements WHERE id = ?", [id]);
+	},
+
+	async deleteByUser(user_id: string): Promise<void> {
+		await pool.query("DELETE FROM achievements WHERE user_id = ?", [user_id]);
 	},
 
 	async count(): Promise<number> {

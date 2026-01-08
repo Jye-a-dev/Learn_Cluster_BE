@@ -16,7 +16,7 @@ git status
 git add .
 
 # 6. Commit
-git commit -m "Initial commit"
+git commit -m " "
 
 # 7. Chọn branch chính (nếu cần)
 git branch -M main
