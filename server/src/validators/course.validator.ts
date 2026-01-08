@@ -1,7 +1,7 @@
 import Joi from "joi";
 import type { CourseStatus } from "../@types/course.js";
 
-// CREATE Course
+// ===== CREATE COURSE =====
 export const createCourseSchema = Joi.object({
 	title: Joi.string().min(3).max(100).required(),
 	description: Joi.string().optional().allow(null, ""),
@@ -14,7 +14,7 @@ export const createCourseSchema = Joi.object({
 		.allow(null),
 });
 
-// UPDATE Course
+// ===== UPDATE COURSE =====
 export const updateCourseSchema = Joi.object({
 	title: Joi.string().min(3).max(100).optional(),
 	description: Joi.string().optional().allow(null, ""),
@@ -27,12 +27,12 @@ export const updateCourseSchema = Joi.object({
 		.allow(null),
 }).min(1);
 
-// ID param
+// ===== ID PARAM =====
 export const idParamSchema = Joi.object({
 	id: Joi.number().integer().required(),
 });
 
-// Query params (optional)
+// ===== QUERY / FILTER =====
 export const queryCoursesSchema = Joi.object({
 	page: Joi.number().integer().min(1).optional(),
 	limit: Joi.number().integer().min(1).max(100).optional(),

@@ -11,6 +11,7 @@ router.get("/:id", validateParams(idParamSchema), ChapterController.getById);
 
 router.post("/", validateBody(createChapterSchema), ChapterController.create);
 router.put("/:id", validateParams(idParamSchema), validateBody(updateChapterSchema), ChapterController.update);
+router.patch("/:id", validateParams(idParamSchema), validateBody(updateChapterSchema), ChapterController.update);
 router.delete("/:id", validateParams(idParamSchema), ChapterController.delete);
 
 export default router;

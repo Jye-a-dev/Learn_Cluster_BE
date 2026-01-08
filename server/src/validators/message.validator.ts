@@ -21,3 +21,7 @@ export const messageIdParamSchema = Joi.object({
 export const messageStudyDateParamSchema = Joi.object({
 	study_date_id: Joi.number().integer().positive().required(),
 });
+
+export const updateMessageSchema = Joi.object({
+	content: Joi.string().optional().allow(null, "")
+}).min(1);

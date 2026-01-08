@@ -37,4 +37,17 @@ export const LessonModel = {
     const [rows] = await pool.query("SELECT COUNT(*) as total FROM lessons");
     return (rows as any)[0].total || 0;
   },
+
+  // ===== EXTRA METHODS =====
+  async getByChapter(chapter_id: number): Promise<Lesson[]> {
+    const [rows] = await pool.query(
+      "SELECT * FROM lessons WHERE chapter_id = ? ORDER BY ordering ASC",
+      [chapter_id]
+    );
+    return rows as Lesson[];
+  },
+
+  async updateOrder(id: number, ordering: number): Promise<void> {
+    await pool.query("UPDATE lessons SET ordering = ? WHERE id = ?", [ordering, id]);
+  }
 };

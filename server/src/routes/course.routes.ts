@@ -9,7 +9,16 @@ router.get("/", validateQuery(queryCoursesSchema), CourseController.getAll);
 router.get("/count", CourseController.count);
 router.get("/:id", validateParams(idParamSchema), CourseController.getById);
 router.post("/", validateBody(createCourseSchema), CourseController.create);
+
 router.put("/:id", validateParams(idParamSchema), validateBody(updateCourseSchema), CourseController.update);
+router.patch("/:id", validateParams(idParamSchema), validateBody(updateCourseSchema), CourseController.update);
+
 router.delete("/:id", validateParams(idParamSchema), CourseController.delete);
+
+router.get("/full", CourseController.getAllFull);
+
+router.get("/full/:id", validateParams(idParamSchema), CourseController.getFullById);
+
+router.get("/teacher/:teacherId", CourseController.getByTeacher);
 
 export default router;

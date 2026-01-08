@@ -66,4 +66,20 @@ export const NoteController = {
 			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
 		}
 	},
+	async getByUser(req: Request, res: Response) {
+		const { user_id } = (req as any).validatedParams;
+		const notes = await NoteService.getByUser(user_id);
+		res.json(notes);
+	},
+
+	async getByLesson(req: Request, res: Response) {
+		const { lesson_id } = (req as any).validatedParams;
+		const notes = await NoteService.getByLesson(Number(lesson_id));
+		res.json(notes);
+	},
+
+	async count(req: Request, res: Response) {
+		const total = await NoteService.count();
+		res.json({ total });
+	},
 };

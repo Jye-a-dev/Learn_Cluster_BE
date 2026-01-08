@@ -10,4 +10,6 @@ export const NoteService = {
 	update: (id: number, data: Partial<Note>) => NoteModel.update(id, data),
 	delete: (id: number) => NoteModel.delete(id),
 	count: () => NoteModel.count(),
+	getByLesson: (lesson_id: number) => NoteModel.getByLesson(lesson_id),
+
 };

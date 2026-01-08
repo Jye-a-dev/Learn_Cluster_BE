@@ -77,4 +77,37 @@ export const LessonController = {
       res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
     }
   },
+
+  // ===== EXTRA CONTROLLER METHODS =====
+  async getByChapter(req: Request, res: Response) {
+    try {
+      const params = (req as any).validatedParams;
+      const chapter_id = params?.chapter_id;
+      if (!chapter_id) return res.status(400).json({ message: "Yêu cầu Chapter ID" });
+
+      const lessons = await LessonService.getByChapter(chapter_id);
+      res.json(lessons || []);
+    } catch (err) {
+      console.error("getByChapter error:", err);
+      res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+    }
+  },
+
+  async updateOrder(req: Request, res: Response) {
+    try {
+      const params = (req as any).validatedParams;
+      const body = (req as any).validatedBody;
+      const id = params?.id;
+      const ordering = body?.ordering;
+
+      if (!id) return res.status(400).json({ message: "Yêu cầu Lesson ID" });
+      if (ordering === undefined) return res.status(400).json({ message: "Yêu cầu ordering" });
+
+      await LessonService.updateOrder(id, ordering);
+      res.json({ message: "Lesson order updated" });
+    } catch (err) {
+      console.error("updateOrder error:", err);
+      res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+    }
+  },
 };

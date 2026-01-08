@@ -68,4 +68,13 @@ export const EnrollmentController = {
 			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
 		}
 	},
+	async getFiltered(req: Request, res: Response) {
+		try {
+			const query = (req as any).validatedQuery; // { user_id?, course_id?, page?, limit? }
+			const enrollments = await EnrollmentService.getFiltered(query);
+			res.json(enrollments || []);
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+		}
+	},
 };

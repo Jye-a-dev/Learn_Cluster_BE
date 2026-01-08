@@ -27,3 +27,12 @@ export const queryNotesSchema = Joi.object({
 	user_id: Joi.string().guid({ version: ["uuidv4", "uuidv5"] }).optional(),
 	lesson_id: Joi.number().integer().optional(),
 });
+// ===== PARAM USER ID =====
+export const noteUserIdParamSchema = Joi.object({
+	user_id: Joi.string().guid({ version: ["uuidv4", "uuidv5"] }).required(),
+});
+
+// ===== PARAM LESSON ID =====
+export const noteLessonIdParamSchema = Joi.object({
+	lesson_id: Joi.number().integer().required(),
+});

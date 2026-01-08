@@ -18,6 +18,11 @@ export const BookmarkModel = {
 		return rows as Bookmark[];
 	},
 
+	async getByLesson(lesson_id: number): Promise<Bookmark[]> {
+		const [rows] = await pool.query("SELECT * FROM bookmarks WHERE lesson_id = ?", [lesson_id]);
+		return rows as Bookmark[];
+	},
+
 	async create(bookmark: Partial<Bookmark>): Promise<number> {
 		const { user_id, lesson_id } = bookmark;
 		const [result] = await pool.query(
@@ -27,8 +32,27 @@ export const BookmarkModel = {
 		return (result as any).insertId;
 	},
 
+	async update(id: number, data: Partial<Bookmark>): Promise<void> {
+		const fields: string[] = [];
+		const values: any[] = [];
+
+		if (data.lesson_id !== undefined) {
+			fields.push("lesson_id = ?");
+			values.push(data.lesson_id);
+		}
+
+		if (fields.length === 0) return;
+
+		values.push(id);
+		await pool.query(`UPDATE bookmarks SET ${fields.join(", ")} WHERE id = ?`, values);
+	},
+
 	async delete(id: number): Promise<void> {
 		await pool.query("DELETE FROM bookmarks WHERE id = ?", [id]);
+	},
+
+	async deleteByUserLesson(user_id: string, lesson_id: number): Promise<void> {
+		await pool.query("DELETE FROM bookmarks WHERE user_id = ? AND lesson_id = ?", [user_id, lesson_id]);
 	},
 
 	async count(): Promise<number> {
