@@ -1,30 +1,31 @@
 //chung 
 
-# Checkout main branch
-git checkout main
-# Cập nhật remote mới nhất
-git fetch origin
-git pull origin main
----
-//Client
-# Tạo branch mới từ main
-git checkout -b client
-# Chỉ giữ folder client, giữ lịch sử
-git filter-repo --path client --path-rename client/:client/
-# Push branch lên remote
-git push origin client
----
-//Server
-# Quay lại main
-git checkout main
-# Tạo branch mới
-git checkout -b server
-# Chỉ giữ folder server, giữ lịch sử
-git filter-repo --path server --path-rename server/:server/
-# Push branch lên remote
-git push origin server
+# 1. Vào thư mục project
+cd Learn_Cluster
 
-Ideal: 
+# 2. Khởi tạo git (nếu chưa có)
+git init
+
+# 3. Thêm remote GitHub
+git remote add origin https://github.com/Jye-a-dev/Learn_Cluster.git
+
+# 4. Kiểm tra trạng thái
+git status
+
+# 5. Add toàn bộ file
+git add .
+
+# 6. Commit
+git commit -m "Initial commit"
+
+# 7. Chọn branch chính (nếu cần)
+git branch -M main
+
+# 8. Push lên GitHub
+git push -u origin main
+
+
+Idea: 
 # Learn Cluster – Hệ thống quản lý học tập & study date thông minh
 
 ---
