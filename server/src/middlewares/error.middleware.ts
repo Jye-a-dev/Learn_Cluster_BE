@@ -1,8 +1,13 @@
-// src/middlewares/error.middleware.ts
-
 import type { Request, Response, NextFunction } from "express";
+import { ApiResponse } from "../interfaces/response.interface.js";
 
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
 	console.error(err);
-	res.status(500).json({ message: "Internal Server Error", error: err.message });
+
+	const resData: ApiResponse<null> = {
+		success: false,
+		error: err.message || "Internal Server Error",
+	};
+
+	res.status(err.status || 500).json(resData);
 };

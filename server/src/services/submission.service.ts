@@ -8,4 +8,13 @@ export const SubmissionService = {
 	update: (id: number, data: Partial<Submission>) => SubmissionModel.update(id, data),
 	delete: (id: number) => SubmissionModel.delete(id),
 	count: () => SubmissionModel.count(),
+	getByAssignment: (assignment_id: number) => SubmissionModel.getByAssignment(assignment_id),
+
+	countByAssignment: (assignment_id: number) => SubmissionModel.countByAssignment(assignment_id),
+
+	getByStudent: (student_id: string) => SubmissionModel.getByStudent(student_id),
+
+	countByStudent: (student_id: string) => SubmissionModel.countByStudent(student_id),
+
+	getByAssignmentAndStudent: (assignment_id: number, student_id: string) => SubmissionModel.getByAssignmentAndStudent(assignment_id, student_id),
 };

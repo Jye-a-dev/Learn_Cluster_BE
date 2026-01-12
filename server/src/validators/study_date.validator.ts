@@ -37,3 +37,10 @@ export const queryStudyDatesSchema = Joi.object({
 	page: Joi.number().integer().min(1).optional(),
 	limit: Joi.number().integer().min(1).max(100).optional(),
 });
+
+export const courseIdParamSchema = Joi.object({
+	course_id: Joi.number().integer().required(),
+});
+export const updateLessonsSchema = Joi.object({
+	lesson_ids: Joi.array().items(Joi.number().integer()).required(),
+});

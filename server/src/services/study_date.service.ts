@@ -6,20 +6,19 @@ export const StudyDateService = {
 	getAll: () => StudyDateModel.getAll(),
 	getById: (id: number) => StudyDateModel.getById(id),
 
-	getFullById: (id: number) =>
-		StudyDateModel.getFullById(id),
+	getFullById: (id: number) => StudyDateModel.getFullById(id),
 
-	getByCourse: (course_id: number) =>
-		StudyDateModel.getByCourse(course_id),
+	getByCourse: (course_id: number) => StudyDateModel.getByCourse(course_id),
 
-	create: (data: Partial<StudyDate>) =>
-		StudyDateModel.create(data),
+	create: (data: Partial<StudyDate>) => StudyDateModel.create(data),
 
-	update: (id: number, data: Partial<StudyDate>) =>
-		StudyDateModel.update(id, data),
+	update: (id: number, data: Partial<StudyDate>) => StudyDateModel.update(id, data),
+	updateLessons: (id: number, lesson_ids: number[]) => StudyDateModel.updateLessons(id, lesson_ids),
 
-	delete: (id: number) =>
-		StudyDateModel.delete(id),
+	delete: (id: number) => StudyDateModel.delete(id),
 
 	count: () => StudyDateModel.count(),
+	getUpcoming: () => StudyDateModel.getUpcoming(),
+
+	query: (filters: any) => StudyDateModel.query(filters),
 };

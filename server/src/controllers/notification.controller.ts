@@ -2,13 +2,17 @@ import type { Request, Response } from "express";
 import { NotificationService } from "../services/notification.service.js";
 
 export const NotificationController = {
+	/* ===== EXISTING ===== */
+
 	async getByUser(req: Request, res: Response) {
 		try {
 			const { user_id } = (req as any).validatedParams;
-			if (!user_id)
-				return res.status(400).json({ message: "Yêu cầu User ID" });
+			const query = (req as any).validatedQuery;
 
-			const notifications = await NotificationService.getByUser(String(user_id));
+			const notifications = await NotificationService.getByUser(
+				String(user_id),
+				query
+			);
 			res.json(notifications || []);
 		} catch (err) {
 			console.error("getByUser error:", err);
@@ -19,9 +23,6 @@ export const NotificationController = {
 	async getById(req: Request, res: Response) {
 		try {
 			const { id } = (req as any).validatedParams;
-			if (!id)
-				return res.status(400).json({ message: "Yêu cầu Notification ID" });
-
 			const notification = await NotificationService.getById(Number(id));
 			if (!notification)
 				return res.status(404).json({ message: "Không thấy notification" });
@@ -57,9 +58,6 @@ export const NotificationController = {
 	async markAsRead(req: Request, res: Response) {
 		try {
 			const { id } = (req as any).validatedParams;
-			if (!id)
-				return res.status(400).json({ message: "Yêu cầu Notification ID" });
-
 			await NotificationService.markAsRead(Number(id));
 			res.json({ message: "Notification marked as read" });
 		} catch (err) {
@@ -71,9 +69,6 @@ export const NotificationController = {
 	async delete(req: Request, res: Response) {
 		try {
 			const { id } = (req as any).validatedParams;
-			if (!id)
-				return res.status(400).json({ message: "Yêu cầu Notification ID" });
-
 			await NotificationService.delete(Number(id));
 			res.json({ message: "Notification deleted" });
 		} catch (err) {
@@ -85,13 +80,62 @@ export const NotificationController = {
 	async countUnread(req: Request, res: Response) {
 		try {
 			const { user_id } = (req as any).validatedParams;
-			if (!user_id)
-				return res.status(400).json({ message: "Yêu cầu User ID" });
-
 			const total = await NotificationService.countUnread(String(user_id));
 			res.json({ total });
 		} catch (err) {
 			console.error("countUnread error:", err);
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+
+	/* ===== NEW METHODS ===== */
+
+	// PATCH /user/:user_id/read-all
+	async markAllAsRead(req: Request, res: Response) {
+		try {
+			const { user_id } = (req as any).validatedParams;
+			await NotificationService.markAllAsRead(String(user_id));
+			res.json({ message: "All notifications marked as read" });
+		} catch (err) {
+			console.error("markAllAsRead error:", err);
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+
+	// GET /user/:user_id/unread
+	async getUnreadByUser(req: Request, res: Response) {
+		try {
+			const { user_id } = (req as any).validatedParams;
+			const notifications = await NotificationService.getUnreadByUser(
+				String(user_id)
+			);
+			res.json(notifications || []);
+		} catch (err) {
+			console.error("getUnreadByUser error:", err);
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+
+	// PATCH /read  (bulk)
+	async bulkMarkAsRead(req: Request, res: Response) {
+		try {
+			const { ids } = (req as any).validatedBody;
+			await NotificationService.bulkMarkAsRead(ids);
+			res.json({ message: "Notifications marked as read" });
+		} catch (err) {
+			console.error("bulkMarkAsRead error:", err);
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+
+	// DELETE /user/:user_id
+	async deleteAllByUser(req: Request, res: Response) {
+		try {
+			const { user_id } = (req as any).validatedParams;
+			await NotificationService.deleteAllByUser(String(user_id));
+			res.json({ message: "All notifications deleted" });
+		} catch (err) {
+			console.error("deleteAllByUser error:", err);
 			res.status(500).json({ message: "Server error", error: err });
 		}
 	},

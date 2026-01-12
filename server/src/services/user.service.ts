@@ -10,4 +10,7 @@ export const UserService = {
 	update: (id: string, data: Partial<User>) => UserModel.update(id, data),
 	delete: (id: string) => UserModel.delete(id),
 	count: () => UserModel.count(),
+	getByRole: (role_id: number) => UserModel.getByRole(role_id),
+	countByRole: (role_id: number) => UserModel.countByRole(role_id),
+	search: (q: string) => UserModel.search(q),
 };

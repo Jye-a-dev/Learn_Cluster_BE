@@ -31,6 +31,26 @@ export const queryUsersSchema = Joi.object({
 	search: Joi.string().optional().allow(""),
 	role_id: Joi.number().optional().allow(null),
 });
+export const roleParamSchema = Joi.object({
+	role_id: Joi.number().integer().required(),
+});
+
+export const searchUserSchema = Joi.object({
+	q: Joi.string().min(1).required(),
+});
+
+export const loginSchema = Joi.object({
+	email: Joi.string().email().required(),
+	password: Joi.string().required(),
+});
+
+export const registerSchema = Joi.object({
+	username: Joi.string().min(3).max(50).required(),
+	email: Joi.string().email().required(),
+	password: Joi.string().min(6).required(),
+	role_id: Joi.number().optional().allow(null),
+});
+
 
 // ===== VALIDATION FUNCTION (OPTIONAL) =====
 export function validateSchema<T>(schema: Joi.Schema<T>, data: any) {

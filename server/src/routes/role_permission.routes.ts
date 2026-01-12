@@ -14,5 +14,6 @@ router.get("/role/:role_id", validateParams(roleIdOnlyParamSchema), RolePermissi
 router.delete("/", validateBody(removeRolePermissionSchema), RolePermissionController.remove);
 
 router.delete("/role/:role_id", validateParams(roleIdOnlyParamSchema), RolePermissionController.removeByRole);
+router.get("/role/:role_id/count", validateParams(roleIdOnlyParamSchema), RolePermissionController.countByRole);
 
 export default router;

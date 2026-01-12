@@ -59,4 +59,19 @@ export const UserModel = {
 		const [rows] = await pool.query("SELECT COUNT(*) as total FROM users");
 		return (rows as any)[0].total || 0;
 	},
+	async getByRole(role_id: number): Promise<User[]> {
+		const [rows] = await pool.query("SELECT * FROM users WHERE role_id = ?", [role_id]);
+		return rows as User[];
+	},
+
+	async countByRole(role_id: number): Promise<number> {
+		const [rows] = await pool.query("SELECT COUNT(*) as total FROM users WHERE role_id = ?", [role_id]);
+		return (rows as any)[0].total || 0;
+	},
+
+	async search(q: string): Promise<User[]> {
+		const like = `%${q}%`;
+		const [rows] = await pool.query("SELECT * FROM users WHERE username LIKE ? OR email LIKE ?", [like, like]);
+		return rows as User[];
+	},
 };

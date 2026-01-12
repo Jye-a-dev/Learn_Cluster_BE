@@ -1,5 +1,4 @@
 // src/services/role-permission.service.ts
-import type { RolePermission } from "../@types/role_permission.js";
 import { RolePermissionModel } from "../models/role_permission.model.js";
 
 export const RolePermissionService = {

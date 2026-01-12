@@ -67,4 +67,20 @@ async getAll(req: Request, res: Response) {
 			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
 		}
 	},
+	async countByRole(req: Request, res: Response) {
+	try {
+		const params = (req as any).validatedParams;
+		const role_id = params?.role_id;
+		if (!role_id) return res.status(400).json({ message: "Yêu cầu Role ID" });
+
+		const total = await RolePermissionService.countByRole(role_id);
+		res.json({ total });
+	} catch (err) {
+		res.status(500).json({
+			message: "Server error",
+			error: err instanceof Error ? err.message : err,
+		});
+	}
+}
+
 };

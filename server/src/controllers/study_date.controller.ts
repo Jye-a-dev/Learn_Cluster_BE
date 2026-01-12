@@ -2,27 +2,27 @@ import type { Request, Response } from "express";
 import { StudyDateService } from "../services/study_date.service.js";
 
 export const StudyDateController = {
-    async getFullById(req: Request, res: Response) {
-	try {
-		const { id } = (req as any).validatedParams;
-		if (!id) return res.status(400).json({ message: "Yêu cầu StudyDate ID" });
+	async getFullById(req: Request, res: Response) {
+		try {
+			const { id } = (req as any).validatedParams;
+			if (!id) return res.status(400).json({ message: "Yêu cầu StudyDate ID" });
 
-		const studyDate = await StudyDateService.getFullById(Number(id));
-		if (!studyDate) return res.status(404).json({ message: "Không thấy study date" });
+			const studyDate = await StudyDateService.getFullById(Number(id));
+			if (!studyDate) return res.status(404).json({ message: "Không thấy study date" });
 
-		res.json(studyDate);
-	} catch (err) {
-		console.error("getFullById error:", err);
-		res.status(500).json({ message: "Server error", error: err });
-	}
-},
+			res.json(studyDate);
+		} catch (err) {
+			console.error("getFullById error:", err);
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
 
 	async getAll(req: Request, res: Response) {
 		try {
-			const studyDates = await StudyDateService.getAll();
+			const query = (req as any).validatedQuery;
+			const studyDates = await StudyDateService.query(query);
 			res.json(studyDates || []);
 		} catch (err) {
-			console.error("getAll error:", err);
 			res.status(500).json({ message: "Server error", error: err });
 		}
 	},
@@ -51,6 +51,24 @@ export const StudyDateController = {
 			res.json(studyDates || []);
 		} catch (err) {
 			console.error("getByCourse error:", err);
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+	async getUpcoming(req: Request, res: Response) {
+		try {
+			const data = await StudyDateService.getUpcoming();
+			res.json(data || []);
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+	async updateLessons(req: Request, res: Response) {
+		try {
+			const { id } = (req as any).validatedParams;
+			const { lesson_ids } = (req as any).validatedBody;
+			await StudyDateService.updateLessons(Number(id), lesson_ids);
+			res.json({ message: "Lessons updated" });
+		} catch (err) {
 			res.status(500).json({ message: "Server error", error: err });
 		}
 	},

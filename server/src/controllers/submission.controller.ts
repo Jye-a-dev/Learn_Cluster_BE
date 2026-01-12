@@ -68,4 +68,53 @@ export const SubmissionController = {
 			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
 		}
 	},
+	async getByAssignment(req: Request, res: Response) {
+		try {
+			const { assignment_id } = (req as any).validatedParams;
+			const data = await SubmissionService.getByAssignment(assignment_id);
+			res.json(data || []);
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+
+	async countByAssignment(req: Request, res: Response) {
+		try {
+			const { assignment_id } = (req as any).validatedParams;
+			const total = await SubmissionService.countByAssignment(assignment_id);
+			res.json({ total });
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+
+	async getByStudent(req: Request, res: Response) {
+		try {
+			const { student_id } = (req as any).validatedParams;
+			const data = await SubmissionService.getByStudent(student_id);
+			res.json(data || []);
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+
+	async countByStudent(req: Request, res: Response) {
+		try {
+			const { student_id } = (req as any).validatedParams;
+			const total = await SubmissionService.countByStudent(student_id);
+			res.json({ total });
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
+
+	async checkSubmitted(req: Request, res: Response) {
+		try {
+			const { assignment_id, student_id } = (req as any).validatedParams;
+			const submission = await SubmissionService.getByAssignmentAndStudent(assignment_id, student_id);
+			res.json({ submitted: !!submission, submission });
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err });
+		}
+	},
 };

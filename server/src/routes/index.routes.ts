@@ -7,6 +7,7 @@ const router = Router();
 const routesPath = path.resolve("./src/routes");
 const routeList: string[] = [];
 
+// Hàm lấy danh sách route từ router
 function extractRoutes(r: any, prefix: string) {
 	const result: { methods: string; path: string }[] = [];
 	r.stack?.forEach((layer: any) => {
@@ -23,6 +24,7 @@ function extractRoutes(r: any, prefix: string) {
 	return result;
 }
 
+// Đọc tất cả file trong routes
 fs.readdirSync(routesPath).forEach((file) => {
 	if (file === "index.routes.ts") return;
 	if (!file.endsWith(".ts") && !file.endsWith(".js")) return;
@@ -37,7 +39,18 @@ fs.readdirSync(routesPath).forEach((file) => {
 			const apiRouter = module.default?.default || module.default;
 			if (!apiRouter?.stack) return;
 
-			// ✅ Mount HTML route trước
+			// Redirect auth HTML sang user HTML
+			if (routeName === "auth") {
+				router.get("/api/auth/html", (req, res) => {
+					res.redirect("/api/user/html");
+				});
+				// Không mount HTML khác cho auth
+				router.use(`/api/${routeName}`, apiRouter);
+				console.log(`✔ /api/${routeName} → ${file} (redirect HTML to /api/user/html)`);
+				return;
+			}
+
+			// Mount HTML route trước cho các route dạng bảng
 			router.get(`/api/${routeName}/html`, async (req, res) => {
 				try {
 					const response = await fetch(`http://localhost:3000/api/${routeName}`);
@@ -48,7 +61,7 @@ fs.readdirSync(routesPath).forEach((file) => {
 					res.render("data", {
 						title: routeName.toUpperCase(),
 						columns,
-						data,
+						data: Array.isArray(data) ? data : [], // chắc chắn là array
 						apiRoutes,
 					});
 				} catch {
@@ -61,7 +74,7 @@ fs.readdirSync(routesPath).forEach((file) => {
 				}
 			});
 
-			// 🔹 Mount API JSON bình thường **sau HTML**
+			// Mount API JSON bình thường
 			router.use(`/api/${routeName}`, apiRouter);
 
 			console.log(`✔ /api/${routeName} → ${file}`);
@@ -69,6 +82,7 @@ fs.readdirSync(routesPath).forEach((file) => {
 		.catch(console.error);
 });
 
+// Trang index hiển thị danh sách route
 router.get("/", (req, res) => {
 	res.render("index", { routes: routeList });
 });

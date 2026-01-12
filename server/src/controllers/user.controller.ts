@@ -98,4 +98,33 @@ export const UserController = {
 			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
 		}
 	},
+	async getByRole(req: Request, res: Response) {
+		try {
+			const role_id = (req as any).validatedParams?.role_id;
+			const users = await UserService.getByRole(role_id);
+			res.json(users || []);
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+		}
+	},
+
+	async countByRole(req: Request, res: Response) {
+		try {
+			const role_id = (req as any).validatedParams?.role_id;
+			const total = await UserService.countByRole(role_id);
+			res.json({ total });
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+		}
+	},
+
+	async search(req: Request, res: Response) {
+		try {
+			const q = (req as any).validatedQuery?.q;
+			const users = await UserService.search(q);
+			res.json(users || []);
+		} catch (err) {
+			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+		}
+	},
 };

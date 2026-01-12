@@ -7,11 +7,15 @@ import { validateBody, validateParams, validateQuery } from "../middlewares/vali
 const router = Router();
 
 router.get("/", validateQuery(queryRolesSchema), RoleController.getAll);
+
 router.get("/count", RoleController.count);
+
 router.get("/:id", validateParams(roleIdParamSchema), RoleController.getById);
 
 router.post("/", validateBody(createRoleSchema), RoleController.create);
+
 router.put("/:id", validateParams(roleIdParamSchema), validateBody(updateRoleSchema), RoleController.update);
+router.patch("/:id", validateParams(roleIdParamSchema), validateBody(updateRoleSchema), RoleController.update);
 router.delete("/:id", validateParams(roleIdParamSchema), RoleController.delete);
 
 export default router;

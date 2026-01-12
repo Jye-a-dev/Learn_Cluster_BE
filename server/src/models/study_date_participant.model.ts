@@ -25,4 +25,23 @@ export const StudyDateParticipantModel = {
 		const [rows] = await pool.query("SELECT COUNT(*) as total FROM study_date_participants WHERE study_date_id = ?", [study_date_id]);
 		return (rows as any)[0].total || 0;
 	},
+
+	async getByUser(user_id: string) {
+		const [rows] = await pool.query("SELECT * FROM study_date_participants WHERE user_id = ?", [user_id]);
+		return rows;
+	},
+
+	async countByUser(user_id: string): Promise<number> {
+		const [rows] = await pool.query("SELECT COUNT(*) as total FROM study_date_participants WHERE user_id = ?", [user_id]);
+		return (rows as any)[0].total || 0;
+	},
+
+	async exists(study_date_id: number, user_id: string): Promise<boolean> {
+		const [rows] = await pool.query("SELECT 1 FROM study_date_participants WHERE study_date_id = ? AND user_id = ? LIMIT 1", [study_date_id, user_id]);
+		return (rows as any[]).length > 0;
+	},
+
+	async removeByStudyDateAndUser(study_date_id: number, user_id: string): Promise<void> {
+		await pool.query("DELETE FROM study_date_participants WHERE study_date_id = ? AND user_id = ?", [study_date_id, user_id]);
+	},
 };
