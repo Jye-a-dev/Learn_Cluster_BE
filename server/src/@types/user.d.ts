@@ -4,7 +4,7 @@ export interface User {
 	username: string;
 	email: string;
 	password_hash: string;
-	role_id?: number | null;
+	role_id?: string | number | null;
 	created_at?: string | null; // timestamp
 	updated_at?: string | null; // timestamp
 }
