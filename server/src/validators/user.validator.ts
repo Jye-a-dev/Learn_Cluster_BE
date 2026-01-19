@@ -20,7 +20,7 @@ export const updateUserSchema = Joi.object({
 // ===== GET USER BY ID / DELETE USER =====
 export const idParamSchema = Joi.object({
 	id: Joi.string()
-		.guid({ version: ["uuidv4", "uuidv5"] })
+		.guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
 		.required(),
 });
 
