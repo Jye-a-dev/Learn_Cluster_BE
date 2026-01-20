@@ -1,7 +1,7 @@
 // src/controllers/user.controller.ts
 import type { Request, Response } from "express";
 import { UserService } from "../services/user.service.js";
-
+import jwt from "jsonwebtoken";
 export const UserController = {
 	async getAll(req: Request, res: Response) {
 		try {
@@ -77,14 +77,39 @@ export const UserController = {
 			const id = params?.id;
 			if (!id) return res.status(400).json({ message: "Yêu cầu User ID" });
 
-			await UserService.update(id, body);
+			// update user
+			const updatedUser = await UserService.update(id, body);
+
+			// 👉 nếu role được update & user đang login chính là user đó
+			const currentUser = (req as any).user;
+
+			if (
+				body.role && // có update role
+				currentUser?.userId === Number(id) // update chính mình
+			) {
+				const newToken = jwt.sign(
+					{
+						userId: currentUser.userId,
+						role: body.role,
+					},
+					process.env.JWT_SECRET!,
+					{ expiresIn: "7d" },
+				);
+
+				res.cookie("access_token", newToken, {
+					httpOnly: true,
+					secure: false,
+					sameSite: "lax",
+					maxAge: 7 * 24 * 60 * 60 * 1000,
+				});
+			}
+
 			res.json({ message: "User updated" });
 		} catch (err) {
 			console.error("update error:", err);
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+			res.status(500).json({ message: "Server error", error: err });
 		}
 	},
-
 	async delete(req: Request, res: Response) {
 		try {
 			const params = (req as any).validatedParams;

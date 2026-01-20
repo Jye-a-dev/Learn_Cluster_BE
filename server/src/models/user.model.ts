@@ -27,7 +27,7 @@ export const UserModel = {
       LEFT JOIN roles r ON u.role_id = r.id
       WHERE u.id = ?
     `,
-			[id]
+			[id],
 		);
 		return (rows as any[])[0] || null;
 	},
@@ -43,12 +43,26 @@ export const UserModel = {
 		return (result as any).insertId;
 	},
 
-	async update(id: string, data: Partial<User>): Promise<void> {
+	async update(id: string, data: Partial<User>): Promise<User | null> {
 		const fields = Object.keys(data)
 			.map((k) => `${k} = ?`)
 			.join(", ");
 		const values = Object.values(data);
+
 		await pool.query(`UPDATE users SET ${fields} WHERE id = ?`, [...values, id]);
+
+		// ⬅️ lấy user mới sau update
+		const [rows] = await pool.query(
+			`
+    SELECT u.*, r.name AS role_name
+    FROM users u
+    LEFT JOIN roles r ON u.role_id = r.id
+    WHERE u.id = ?
+    `,
+			[id],
+		);
+
+		return (rows as any[])[0] || null;
 	},
 
 	async delete(id: string): Promise<void> {

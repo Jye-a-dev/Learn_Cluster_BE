@@ -1,4 +1,3 @@
-// src/validators/role.validator.ts
 import Joi from "joi";
 
 // ===== CREATE ROLE =====
@@ -15,7 +14,9 @@ export const updateRoleSchema = Joi.object({
 
 // ===== GET / DELETE ROLE BY ID =====
 export const roleIdParamSchema = Joi.object({
-	id: Joi.number().integer().min(1).required(),
+	id: Joi.string()
+		.guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+		.required(),
 });
 
 // ===== QUERY ROLES (OPTIONAL) =====
