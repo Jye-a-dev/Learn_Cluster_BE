@@ -4,11 +4,7 @@ import Joi from "joi";
 export const createUserSchema = Joi.object({
 	username: Joi.string().min(3).max(50).required(),
 	email: Joi.string().email().required(),
-	password_hash: Joi.string().min(6).required(),
-	role_id: Joi.string()
-		.guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
-		.optional()
-		.allow(null),
+	password: Joi.string().min(6).required(),
 });
 
 // ===== UPDATE USER =====

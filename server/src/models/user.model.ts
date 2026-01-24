@@ -1,7 +1,7 @@
 // src/models/user.model.ts
 import type { User } from "../@types/user.js";
 import { db as pool } from "../config/db.js";
-
+const DEFAULT_ROLE_ID = "879d3f96-ebd2-11f0-b513-acf23c8aac4e";
 export const UserModel = {
 	async getAll(): Promise<User[]> {
 		const [rows] = await pool.query("SELECT * FROM users");
@@ -33,13 +33,16 @@ export const UserModel = {
 	},
 
 	async create(user: Partial<User>): Promise<string> {
-		const { username, email, password_hash, role_id } = user;
-		const [result] = await pool.query("INSERT INTO users (username, email, password_hash, role_id) VALUES (?, ?, ?, ?)", [
-			username,
-			email,
-			password_hash,
-			role_id || null,
-		]);
+		const { username, email, password_hash } = user;
+
+		const [result] = await pool.query(
+			`
+    INSERT INTO users (username, email, password_hash, role_id)
+    VALUES (?, ?, ?, ?)
+    `,
+			[username, email, password_hash, DEFAULT_ROLE_ID],
+		);
+
 		return (result as any).insertId;
 	},
 
