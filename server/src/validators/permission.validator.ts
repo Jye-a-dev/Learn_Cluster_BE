@@ -11,8 +11,11 @@ export const updatePermissionSchema = Joi.object({
 }).min(1);
 
 export const idParamSchema = Joi.object({
-	id: Joi.number().integer().required(),
+	id: Joi.string()
+		.guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+		.required(),
 });
+
 
 export const queryPermissionSchema = Joi.object({
 	page: Joi.number().integer().min(1).default(1),

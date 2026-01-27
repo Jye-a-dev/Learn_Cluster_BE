@@ -20,15 +20,17 @@ CREATE TABLE
         description TEXT
     );
 
-CREATE TABLE
-    role_permissions (
-        role_id INT NOT NULL,
-        permission_id INT NOT NULL,
-        PRIMARY KEY (role_id, permission_id),
-        FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE,
-        FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
-    );
+CREATE TABLE role_permissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role_id INT NOT NULL,
+    permission_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
+    UNIQUE KEY uq_role_permission (role_id, permission_id),
+
+    FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE,
+    FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
+);
 -- ==========================
 -- Users
 -- ==========================

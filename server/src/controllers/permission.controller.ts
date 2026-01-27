@@ -5,11 +5,7 @@ export const PermissionController = {
 	async getAll(req: Request, res: Response) {
 		try {
 			const query = (req as any).validatedQuery;
-			const data = await PermissionService.getAll(
-				query.page,
-				query.limit,
-				query.keyword
-			);
+			const data = await PermissionService.getAll(query.page, query.limit, query.keyword);
 			res.json(data);
 		} catch (err) {
 			res.status(500).json({ message: "Server error" });
@@ -19,8 +15,14 @@ export const PermissionController = {
 	async getById(req: Request, res: Response) {
 		try {
 			const { id } = (req as any).validatedParams;
-			const data = await PermissionService.getById(id);
-			if (!data) return res.status(404).json({ message: "Not found" });
+
+			// KHÔNG convert number
+			const data = await PermissionService.getById(id as any);
+
+			if (!data) {
+				return res.status(404).json({ message: "Not found" });
+			}
+
 			res.json(data);
 		} catch {
 			res.status(500).json({ message: "Server error" });
@@ -53,7 +55,8 @@ export const PermissionController = {
 		try {
 			const { id } = (req as any).validatedParams;
 			const body = (req as any).validatedBody;
-			await PermissionService.update(id, body);
+
+			await PermissionService.update(id as any, body);
 			res.json({ message: "Updated" });
 		} catch {
 			res.status(500).json({ message: "Server error" });
@@ -63,7 +66,8 @@ export const PermissionController = {
 	async delete(req: Request, res: Response) {
 		try {
 			const { id } = (req as any).validatedParams;
-			await PermissionService.delete(id);
+
+			await PermissionService.delete(id as any);
 			res.json({ message: "Deleted" });
 		} catch {
 			res.status(500).json({ message: "Server error" });
