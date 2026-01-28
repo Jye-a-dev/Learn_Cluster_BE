@@ -13,8 +13,6 @@ router.get("/:id/full", validateParams(idParamSchema), StudyDateController.getFu
 router.get("/course/:course_id", validateParams(courseIdParamSchema), StudyDateController.getByCourse);
 router.get("/upcoming", StudyDateController.getUpcoming);
 
-router.patch("/:id/lessons", validateParams(idParamSchema), validateBody(updateLessonsSchema), StudyDateController.updateLessons);
-
 router.post("/", validateBody(createStudyDateSchema), StudyDateController.create);
 router.put("/:id", validateParams(idParamSchema), validateBody(updateStudyDateSchema), StudyDateController.update);
 router.patch("/:id", validateParams(idParamSchema), validateBody(updateStudyDateSchema), StudyDateController.update);

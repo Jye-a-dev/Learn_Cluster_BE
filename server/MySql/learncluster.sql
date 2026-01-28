@@ -1,222 +1,224 @@
--- 1. Tạo database
-CREATE DATABASE IF NOT EXISTS learncluster;
-
-USE learncluster;
-
--- ==========================
--- Roles & Permissions
--- ==========================
+-- =========================
+-- DATABASE: learncluster
+-- =========================
+-- USERS & ROLES
 CREATE TABLE
-    roles (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(50) UNIQUE NOT NULL,
-        description TEXT
-    );
+  roles (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT
+  ) ENGINE = InnoDB;
 
 CREATE TABLE
-    permissions (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) UNIQUE NOT NULL,
-        description TEXT
-    );
-
-CREATE TABLE role_permissions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    role_id INT NOT NULL,
-    permission_id INT NOT NULL,
+  users (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role_id CHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE SET NULL
+  ) ENGINE = InnoDB;
 
-    UNIQUE KEY uq_role_permission (role_id, permission_id),
+CREATE TABLE
+  permissions (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT
+  ) ENGINE = InnoDB;
 
+CREATE TABLE
+  role_permissions (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    role_id CHAR(36) NOT NULL,
+    permission_id CHAR(36) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (role_id, permission_id),
     FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE,
     FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
-);
--- ==========================
--- Users
--- ==========================
-CREATE TABLE
-    users (
-        id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
-        username VARCHAR(50) UNIQUE NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        role_id INT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE SET NULL
-    );
+  ) ENGINE = InnoDB;
 
--- ==========================
--- Courses, Chapters, Lessons
--- ==========================
+-- COURSES----------------------
 CREATE TABLE
-    courses (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        description TEXT,
-        objective TEXT,
-        duration_hours INT,
-        status ENUM ('draft', 'public', 'closed') DEFAULT 'draft',
-        teacher_id CHAR(36),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (teacher_id) REFERENCES users (id) ON DELETE SET NULL
-    );
+  courses (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    objective TEXT,
+    duration_hours INT,
+    status ENUM ('draft', 'public', 'closed') DEFAULT 'draft',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  ) ENGINE = InnoDB;
 
 CREATE TABLE
-    chapters (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        course_id INT NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        ordering INT NOT NULL,
-        FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
-    );
+  course_instructors (
+    id CHAR(36) NOT NULL DEFAULT (UUID ()),
+    course_id CHAR(36) NOT NULL,
+    user_id CHAR(36) NOT NULL,
+    role_in_course ENUM ('Teacher', 'TA', 'Moderator') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_course_user_role (course_id, user_id, role_in_course),
+    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
 
 CREATE TABLE
-    lessons (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        chapter_id INT NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        content_type ENUM ('video', 'pdf', 'text') NOT NULL,
-        content_url TEXT,
-        ordering INT NOT NULL,
-        FOREIGN KEY (chapter_id) REFERENCES chapters (id) ON DELETE CASCADE
-    );
+  enrollments (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    user_id CHAR(36) NOT NULL,
+    course_id CHAR(36) NOT NULL,
+    enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, course_id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
 
--- ==========================
--- Enrollment
--- ==========================
+-- CONTENT STRUCTURE---------------------------------------
 CREATE TABLE
-    enrollments (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id CHAR(36) NOT NULL,
-        course_id INT NOT NULL,
-        enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE (user_id, course_id),
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-        FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
-    );
-
--- ==========================
--- Assignments & Grades
--- ==========================
-CREATE TABLE
-    assignments (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        course_id INT NOT NULL,
-        title VARCHAR(255),
-        description TEXT,
-        file_url TEXT,
-        deadline DATETIME,
-        FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
-    );
+  chapters (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    course_id CHAR(36) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    ordering INT NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
 
 CREATE TABLE
-    submissions (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        assignment_id INT NOT NULL,
-        student_id CHAR(36) NOT NULL,
-        file_url TEXT,
-        text_submission TEXT,
-        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (assignment_id) REFERENCES assignments (id) ON DELETE CASCADE,
-        FOREIGN KEY (student_id) REFERENCES users (id) ON DELETE CASCADE
-    );
+  lessons (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    chapter_id CHAR(36) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content_type ENUM ('video', 'pdf', 'text') NOT NULL,
+    content_url TEXT,
+    ordering INT NOT NULL,
+    FOREIGN KEY (chapter_id) REFERENCES chapters (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
+
+-- ASSIGNMENTS & GRADES
+CREATE TABLE
+  assignments (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    course_id CHAR(36) NOT NULL,
+    title VARCHAR(255),
+    description TEXT,
+    file_url TEXT,
+    deadline DATETIME,
+    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
 
 CREATE TABLE
-    grades (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        submission_id INT NOT NULL,
-        grader_id CHAR(36),
-        score DECIMAL(5, 2),
-        feedback TEXT,
-        graded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (submission_id) REFERENCES submissions (id) ON DELETE CASCADE,
-        FOREIGN KEY (grader_id) REFERENCES users (id) ON DELETE SET NULL
-    );
-
--- ==========================
--- Study Dates & Participants
--- ==========================
-CREATE TABLE
-    study_dates (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        course_id INT NOT NULL,
-        title VARCHAR(255),
-        lesson_ids JSON,
-        scheduled_at DATETIME,
-        location TEXT,
-        created_by CHAR(36),
-        FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE,
-        FOREIGN KEY (created_by) REFERENCES users (id)
-    );
+  submissions (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    assignment_id CHAR(36) NOT NULL,
+    student_id CHAR(36) NOT NULL,
+    file_url TEXT,
+    text_submission TEXT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (assignment_id) REFERENCES assignments (id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
 
 CREATE TABLE
-    study_date_participants (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        study_date_id INT NOT NULL,
-        user_id CHAR(36) NOT NULL,
-        joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE (study_date_id, user_id),
-        FOREIGN KEY (study_date_id) REFERENCES study_dates (id) ON DELETE CASCADE,
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-    );
+  grades (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    submission_id CHAR(36) NOT NULL UNIQUE,
+    grader_id CHAR(36),
+    score DECIMAL(5, 2),
+    feedback TEXT,
+    graded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (submission_id) REFERENCES submissions (id) ON DELETE CASCADE,
+    FOREIGN KEY (grader_id) REFERENCES users (id) ON DELETE SET NULL
+  ) ENGINE = InnoDB;
 
--- ==========================
--- Messages & Notifications
--- ==========================
+-- STUDY DATE
 CREATE TABLE
-    messages (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        study_date_id INT NOT NULL,
-        sender_id CHAR(36),
-        content TEXT,
-        sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (study_date_id) REFERENCES study_dates (id) ON DELETE CASCADE,
-        FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE SET NULL
-    );
-
-CREATE TABLE
-    notifications (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id CHAR(36) NOT NULL,
-        type VARCHAR(50),
-        content TEXT,
-        is_read BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-    );
-
--- ==========================
--- Notes, Bookmarks, Achievements
--- ==========================
-CREATE TABLE
-    notes (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id CHAR(36) NOT NULL,
-        lesson_id INT NOT NULL,
-        content TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-        FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE CASCADE
-    );
+  study_dates (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    course_id CHAR(36) NOT NULL,
+    title VARCHAR(255),
+    scheduled_at DATETIME,
+    location TEXT,
+    created_by CHAR(36),
+    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE SET NULL
+  ) ENGINE = InnoDB;
 
 CREATE TABLE
-    bookmarks (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id CHAR(36) NOT NULL,
-        lesson_id INT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-        FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE CASCADE
-    );
+  study_date_participants (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    study_date_id CHAR(36) NOT NULL,
+    user_id CHAR(36) NOT NULL,
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (study_date_id, user_id),
+    FOREIGN KEY (study_date_id) REFERENCES study_dates (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
 
 CREATE TABLE
-    achievements (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id CHAR(36) NOT NULL,
-        name VARCHAR(100),
-        description TEXT,
-        awarded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-    );
+  study_date_lessons (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    study_date_id CHAR(36) NOT NULL,
+    lesson_id CHAR(36) NOT NULL,
+    UNIQUE KEY uq_study_date_lesson (study_date_id, lesson_id),
+    FOREIGN KEY (study_date_id) REFERENCES study_dates (id) ON DELETE CASCADE,
+    FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
+
+-- INTERACTION
+CREATE TABLE
+  messages (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    study_date_id CHAR(36) NOT NULL,
+    sender_id CHAR(36),
+    content TEXT,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (study_date_id) REFERENCES study_dates (id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE SET NULL
+  ) ENGINE = InnoDB;
+
+CREATE TABLE
+  notes (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    user_id CHAR(36) NOT NULL,
+    lesson_id CHAR(36) NOT NULL,
+    content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, lesson_id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
+
+CREATE TABLE
+  bookmarks (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    user_id CHAR(36) NOT NULL,
+    lesson_id CHAR(36) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, lesson_id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
+
+CREATE TABLE
+  notifications (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    user_id CHAR(36) NOT NULL,
+    type VARCHAR(50),
+    content TEXT,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
+
+CREATE TABLE
+  achievements (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    user_id CHAR(36) NOT NULL,
+    name VARCHAR(100),
+    description TEXT,
+    awarded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;

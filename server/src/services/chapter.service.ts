@@ -1,18 +1,32 @@
-import type { Chapter } from "../@types/chapter.js";
 import { ChapterModel } from "../models/chapter.model.js";
+import type { Chapter } from "../@types/chapter.js";
 
 export const ChapterService = {
-	getAll: (query?: { course_id?: number; page?: number; limit?: number }) => ChapterModel.getAll(query),
+	getAll(query?: { course_id?: string; page?: number; limit?: number }): Promise<Chapter[]> {
+		return ChapterModel.getAll(query);
+	},
 
-	getById: (id: number) => ChapterModel.getById(id),
+	getById(id: string): Promise<Chapter | null> {
+		return ChapterModel.getById(id);
+	},
 
-	getByCourse: (course_id: number) => ChapterModel.getByCourse(course_id),
+	getByCourse(course_id: string): Promise<Chapter[]> {
+		return ChapterModel.getByCourse(course_id);
+	},
 
-	create: (chapter: Partial<Chapter>) => ChapterModel.create(chapter),
+	create(data: Partial<Chapter>) {
+		return ChapterModel.create(data);
+	},
 
-	update: (id: number, data: Partial<Chapter>) => ChapterModel.update(id, data),
+	update(id: string, data: Partial<Chapter>) {
+		return ChapterModel.update(id, data);
+	},
 
-	delete: (id: number) => ChapterModel.delete(id),
+	delete(id: string) {
+		return ChapterModel.delete(id);
+	},
 
-	count: (course_id?: number) => ChapterModel.count(course_id),
+	count(course_id?: string) {
+		return ChapterModel.count(course_id);
+	},
 };

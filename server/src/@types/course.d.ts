@@ -1,14 +1,12 @@
-// src/@types/course.d.ts
 export type CourseStatus = "draft" | "public" | "closed";
 
 export interface Course {
-	id?: number; // INT AUTO_INCREMENT
+	id?: string; // UUID CHAR(36)
 	title: string;
 	description?: string | null;
 	objective?: string | null;
 	duration_hours?: number | null;
 	status?: CourseStatus;
-	teacher_id?: string | null; // UUID
-	created_at?: string | null; // timestamp
-	updated_at?: string | null; // timestamp
+	created_at?: string | null;
+	updated_at?: string | null;
 }

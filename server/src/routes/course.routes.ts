@@ -15,10 +15,6 @@ router.patch("/:id", validateParams(idParamSchema), validateBody(updateCourseSch
 
 router.delete("/:id", validateParams(idParamSchema), CourseController.delete);
 
-router.get("/full", CourseController.getAllFull);
 
-router.get("/full/:id", validateParams(idParamSchema), CourseController.getFullById);
-
-router.get("/teacher/:teacherId", CourseController.getByTeacher);
 
 export default router;
