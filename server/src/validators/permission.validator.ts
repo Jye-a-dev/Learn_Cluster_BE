@@ -18,7 +18,7 @@ export const idParamSchema = Joi.object({
 
 
 export const queryPermissionSchema = Joi.object({
-	page: Joi.number().integer().min(1).default(1),
-	limit: Joi.number().integer().min(1).max(100).default(20),
+	page: Joi.number().integer().min(1).optional(),
+	limit: Joi.number().integer().min(1).max(100).optional(),
 	keyword: Joi.string().max(100).optional(),
 });
