@@ -1,17 +1,19 @@
 import Joi from "joi";
 
-const uuid = Joi.string().guid({
-  version: ["uuidv1", "uuidv4", "uuidv5"],
-});
-
+const uuid = Joi.string().guid();
 // ===== CREATE LESSON =====
 export const createLessonSchema = Joi.object({
   chapter_id: uuid.required(),
   title: Joi.string().max(255).required(),
   content_type: Joi.string().valid("video", "pdf", "text").required(),
-  content_url: Joi.string().uri().optional().allow(null, ""),
+  content_url: Joi.alternatives().conditional("content_type", {
+    is: "text",
+    then: Joi.valid(null, ""),
+    otherwise: Joi.string().uri().required(),
+  }),
   ordering: Joi.number().integer().min(1).required(),
 });
+
 
 // ===== UPDATE LESSON =====
 export const updateLessonSchema = Joi.object({
