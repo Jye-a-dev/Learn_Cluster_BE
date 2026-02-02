@@ -10,37 +10,50 @@ export const CourseInstructorModel = {
 
 	// ===== GET BY ID =====
 	async getById(id: string): Promise<CourseInstructor | null> {
-		const [rows] = await pool.query("SELECT * FROM course_instructors WHERE id = ?", [id]);
+		const [rows] = await pool.query(
+			"SELECT * FROM course_instructors WHERE id = ?",
+			[id],
+		);
 		return (rows as CourseInstructor[])[0] || null;
 	},
 
 	// ===== GET BY COURSE =====
 	async getByCourse(course_id: string): Promise<CourseInstructor[]> {
-		const [rows] = await pool.query("SELECT * FROM course_instructors WHERE course_id = ?", [course_id]);
+		const [rows] = await pool.query(
+			"SELECT * FROM course_instructors WHERE course_id = ?",
+			[course_id],
+		);
 		return rows as CourseInstructor[];
 	},
 
 	// ===== GET BY USER =====
 	async getByUser(user_id: string): Promise<CourseInstructor[]> {
-		const [rows] = await pool.query("SELECT * FROM course_instructors WHERE user_id = ?", [user_id]);
+		const [rows] = await pool.query(
+			"SELECT * FROM course_instructors WHERE user_id = ?",
+			[user_id],
+		);
 		return rows as CourseInstructor[];
 	},
 
 	// ===== CREATE =====
 	async create(data: CourseInstructor): Promise<void> {
-		const { id, course_id, user_id, role_in_course } = data;
+		const { course_id, user_id, role_in_course } = data;
 
+		// ❗ KHÔNG insert id → DB tự sinh UUID()
 		await pool.query(
 			`
-			INSERT INTO course_instructors (id, course_id, user_id, role_in_course)
-			VALUES (?, ?, ?, ?)
+			INSERT INTO course_instructors (course_id, user_id, role_in_course)
+			VALUES (?, ?, ?)
 			`,
-			[id, course_id, user_id, role_in_course],
+			[course_id, user_id, role_in_course],
 		);
 	},
 
 	// ===== UPDATE ROLE =====
-	async updateRole(id: string, role_in_course: CourseInstructor["role_in_course"]): Promise<void> {
+	async updateRole(
+		id: string,
+		role_in_course: CourseInstructor["role_in_course"],
+	): Promise<void> {
 		await pool.query(
 			`
 			UPDATE course_instructors
@@ -58,12 +71,18 @@ export const CourseInstructorModel = {
 
 	// ===== DELETE ALL BY COURSE =====
 	async deleteByCourse(course_id: string): Promise<void> {
-		await pool.query("DELETE FROM course_instructors WHERE course_id = ?", [course_id]);
+		await pool.query(
+			"DELETE FROM course_instructors WHERE course_id = ?",
+			[course_id],
+		);
 	},
 
 	// ===== COUNT BY COURSE =====
 	async countByCourse(course_id: string): Promise<number> {
-		const [rows] = await pool.query("SELECT COUNT(*) AS total FROM course_instructors WHERE course_id = ?", [course_id]);
+		const [rows] = await pool.query(
+			"SELECT COUNT(*) AS total FROM course_instructors WHERE course_id = ?",
+			[course_id],
+		);
 		return (rows as any)[0].total || 0;
 	},
 
