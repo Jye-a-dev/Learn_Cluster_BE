@@ -93,6 +93,7 @@ CREATE TABLE
     title VARCHAR(255) NOT NULL,
     content_type ENUM ('video', 'pdf', 'text') NOT NULL,
     content_url TEXT,
+    content_text LONGTEXT NULL,
     ordering INT NOT NULL,
     FOREIGN KEY (chapter_id) REFERENCES chapters (id) ON DELETE CASCADE
   ) ENGINE = InnoDB;
