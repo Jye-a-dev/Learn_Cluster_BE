@@ -2,7 +2,7 @@ import Joi from "joi";
 
 // ===== CREATE ASSIGNMENT =====
 export const createAssignmentSchema = Joi.object({
-	course_id: Joi.number().integer().required(),
+	course_id: Joi.string().uuid().required(),
 	title: Joi.string().optional().allow(null, ""),
 	description: Joi.string().optional().allow(null, ""),
 	file_url: Joi.string().optional().allow(null, ""),
@@ -11,7 +11,7 @@ export const createAssignmentSchema = Joi.object({
 
 // ===== UPDATE / PATCH ASSIGNMENT =====
 export const updateAssignmentSchema = Joi.object({
-	course_id: Joi.number().integer().optional(),
+	course_id: Joi.string().uuid().optional(),
 	title: Joi.string().optional().allow(null, ""),
 	description: Joi.string().optional().allow(null, ""),
 	file_url: Joi.string().optional().allow(null, ""),
@@ -20,17 +20,17 @@ export const updateAssignmentSchema = Joi.object({
 
 // ===== PARAM: ASSIGNMENT ID =====
 export const assignmentIdParamSchema = Joi.object({
-	id: Joi.number().integer().required(),
+	id: Joi.string().uuid().required(),
 });
 
 // ===== PARAM: COURSE ID =====
 export const courseIdParamSchema = Joi.object({
-	courseId: Joi.number().integer().required(),
+	courseId: Joi.string().uuid().required(),
 });
 
 // ===== QUERY ASSIGNMENTS =====
 export const queryAssignmentsSchema = Joi.object({
-	course_id: Joi.number().integer().optional(),
+	course_id: Joi.string().uuid().optional(),
 	page: Joi.number().integer().min(1).optional(),
 	limit: Joi.number().integer().min(1).max(100).optional(),
 	deadline_before: Joi.date().optional(),
