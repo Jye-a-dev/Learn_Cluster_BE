@@ -1,45 +1,54 @@
-// src/validators/bookmark.validator.ts
 import Joi from "joi";
 
-// ===== CREATE BOOKMARK =====
+/* ===================== CREATE BOOKMARK ===================== */
+
 export const createBookmarkSchema = Joi.object({
-	user_id: Joi.string()
-		.guid({ version: ["uuidv4", "uuidv5"] })
-		.required(),
-	lesson_id: Joi.number().integer().required(),
+	user_id: Joi.string().uuid().required(),
+	lesson_id: Joi.string().uuid().required(),
 });
 
-// ===== PARAM ID =====
+
+/* ===================== PARAM ID (PRIMARY KEY) ===================== */
+
 export const bookmarkIdParamSchema = Joi.object({
-	id: Joi.number().integer().required(),
+	id: Joi.string().uuid().required(),
 });
 
-// ===== QUERY BOOKMARKS =====
+
+/* ===================== QUERY BOOKMARKS ===================== */
+
 export const queryBookmarksSchema = Joi.object({
 	page: Joi.number().integer().min(1).optional(),
 	limit: Joi.number().integer().min(1).max(100).optional(),
-	user_id: Joi.string().guid({ version: ["uuidv4", "uuidv5"] }).optional(),
+	user_id: Joi.string().uuid().optional(),
+	lesson_id: Joi.string().uuid().optional(),
 });
 
-// ===== UPDATE BOOKMARK =====
+
+/* ===================== UPDATE BOOKMARK ===================== */
+
 export const updateBookmarkSchema = Joi.object({
-	lesson_id: Joi.number().integer().required(),
+	lesson_id: Joi.string().uuid().required(),
 });
 
-// ===== DELETE BOOKMARK BY USER + LESSON =====
+
+/* ===================== DELETE BY USER + LESSON ===================== */
+
 export const deleteBookmarkByUserLessonSchema = Joi.object({
-	user_id: Joi.string()
-		.guid({ version: ["uuidv4", "uuidv5"] })
-		.required(),
-	lesson_id: Joi.number().integer().required(),
+	user_id: Joi.string().uuid().required(),
+	lesson_id: Joi.string().uuid().required(),
 });
 
-// ===== PARAM USER ID =====
+
+/* ===================== PARAM USER ID ===================== */
+
 export const userIdParamSchema = Joi.object({
-	userId: Joi.string().guid({ version: ["uuidv4", "uuidv5"] }).required(),
+	userId: Joi.string().uuid().required(),
 });
 
-// ===== PARAM LESSON ID =====
+
+/* ===================== PARAM LESSON ID ===================== */
+
 export const lessonIdParamSchema = Joi.object({
-	lessonId: Joi.number().integer().required(),
+	lessonId: Joi.string().uuid().required(),
 });
