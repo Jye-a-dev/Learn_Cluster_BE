@@ -2,130 +2,117 @@ import type { Notification } from "../@types/notification.js";
 import { db as pool } from "../config/db.js";
 
 export const NotificationModel = {
-	/* ===== EXISTING ===== */
+  async getByUser(user_id: string, query?: any): Promise<Notification[]> {
+    const { page = 1, limit = 20, type, is_read } = query || {};
+    const offset = (page - 1) * limit;
 
-	async getByUser(user_id: string, query?: any): Promise<Notification[]> {
-		const {
-			page = 1,
-			limit = 20,
-			type,
-			is_read,
-		} = query || {};
+    let sql = `SELECT * FROM notifications WHERE user_id = ?`;
+    const params: any[] = [user_id];
 
-		const offset = (page - 1) * limit;
+    if (type) {
+      sql += " AND type = ?";
+      params.push(type);
+    }
 
-		let sql = `
-			SELECT * FROM notifications
-			WHERE user_id = ?
-		`;
-		const params: any[] = [user_id];
+    if (typeof is_read === "boolean") {
+      sql += " AND is_read = ?";
+      params.push(is_read);
+    }
 
-		if (type) {
-			sql += " AND type = ?";
-			params.push(type);
-		}
+    sql += ` ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+    params.push(limit, offset);
 
-		if (typeof is_read === "boolean") {
-			sql += " AND is_read = ?";
-			params.push(is_read);
-		}
+    const [rows] = await pool.query(sql, params);
+    return rows as Notification[];
+  },
 
-		sql += `
-			ORDER BY created_at DESC
-			LIMIT ? OFFSET ?
-		`;
-		params.push(limit, offset);
+  async getAll(): Promise<Notification[]> {
+    const [rows] = await pool.query(
+      "SELECT * FROM notifications ORDER BY created_at DESC"
+    );
+    return rows as Notification[];
+  },
 
-		const [rows] = await pool.query(sql, params);
-		return rows as Notification[];
-	},
+  async getById(id: string): Promise<Notification | null> {
+    const [rows] = await pool.query(
+      "SELECT * FROM notifications WHERE id = ?",
+      [id]
+    );
+    return (rows as Notification[])[0] ?? null;
+  },
 
-	async getAll(): Promise<Notification[]> {
-		const [rows] = await pool.query(
-			"SELECT * FROM notifications ORDER BY created_at DESC"
-		);
-		return rows as Notification[];
-	},
+  async create(data: Partial<Notification>): Promise<string> {
+    const { user_id, type, content } = data;
 
-	async getById(id: number): Promise<Notification | null> {
-		const [rows] = await pool.query(
-			"SELECT * FROM notifications WHERE id = ?",
-			[id]
-		);
-		return (rows as Notification[])[0] ?? null;
-	},
+    const id = crypto.randomUUID(); // Node 18+
 
-	async create(data: Partial<Notification>): Promise<number> {
-		const { user_id, type, content } = data;
+    await pool.query(
+      `INSERT INTO notifications (id, user_id, type, content)
+       VALUES (?, ?, ?, ?)`,
+      [id, user_id, type ?? null, content ?? null]
+    );
 
-		const [result] = await pool.query(
-			`INSERT INTO notifications (user_id, type, content)
-			 VALUES (?, ?, ?)`,
-			[user_id, type ?? null, content ?? null]
-		);
+    return id;
+  },
 
-		return (result as any).insertId;
-	},
+  async markAsRead(id: string): Promise<void> {
+    await pool.query(
+      "UPDATE notifications SET is_read = TRUE WHERE id = ?",
+      [id]
+    );
+  },
 
-	async markAsRead(id: number): Promise<void> {
-		await pool.query(
-			"UPDATE notifications SET is_read = TRUE WHERE id = ?",
-			[id]
-		);
-	},
+  async delete(id: string): Promise<void> {
+    await pool.query(
+      "DELETE FROM notifications WHERE id = ?",
+      [id]
+    );
+  },
 
-	async delete(id: number): Promise<void> {
-		await pool.query(
-			"DELETE FROM notifications WHERE id = ?",
-			[id]
-		);
-	},
+  async countUnread(user_id: string): Promise<number> {
+    const [rows] = await pool.query(
+      `SELECT COUNT(*) AS total
+       FROM notifications
+       WHERE user_id = ? AND is_read = FALSE`,
+      [user_id]
+    );
 
-	async countUnread(user_id: string): Promise<number> {
-		const [rows] = await pool.query(
-			`SELECT COUNT(*) AS total
-			 FROM notifications
-			 WHERE user_id = ? AND is_read = FALSE`,
-			[user_id]
-		);
+    return (rows as any)[0]?.total ?? 0;
+  },
 
-		return (rows as any)[0]?.total ?? 0;
-	},
+  async markAllAsRead(user_id: string): Promise<void> {
+    await pool.query(
+      "UPDATE notifications SET is_read = TRUE WHERE user_id = ?",
+      [user_id]
+    );
+  },
 
-	/* ===== NEW ===== */
+  async getUnreadByUser(user_id: string): Promise<Notification[]> {
+    const [rows] = await pool.query(
+      `SELECT * FROM notifications
+       WHERE user_id = ? AND is_read = FALSE
+       ORDER BY created_at DESC`,
+      [user_id]
+    );
 
-	async markAllAsRead(user_id: string): Promise<void> {
-		await pool.query(
-			"UPDATE notifications SET is_read = TRUE WHERE user_id = ?",
-			[user_id]
-		);
-	},
+    return rows as Notification[];
+  },
 
-	async getUnreadByUser(user_id: string): Promise<Notification[]> {
-		const [rows] = await pool.query(
-			`SELECT * FROM notifications
-			 WHERE user_id = ? AND is_read = FALSE
-			 ORDER BY created_at DESC`,
-			[user_id]
-		);
-		return rows as Notification[];
-	},
+  async bulkMarkAsRead(ids: string[]): Promise<void> {
+    if (!ids.length) return;
 
-	async bulkMarkAsRead(ids: number[]): Promise<void> {
-		if (ids.length === 0) return;
+    await pool.query(
+      `UPDATE notifications
+       SET is_read = TRUE
+       WHERE id IN (?)`,
+      [ids]
+    );
+  },
 
-		await pool.query(
-			`UPDATE notifications
-			 SET is_read = TRUE
-			 WHERE id IN (?)`,
-			[ids]
-		);
-	},
-
-	async deleteAllByUser(user_id: string): Promise<void> {
-		await pool.query(
-			"DELETE FROM notifications WHERE user_id = ?",
-			[user_id]
-		);
-	},
+  async deleteAllByUser(user_id: string): Promise<void> {
+    await pool.query(
+      "DELETE FROM notifications WHERE user_id = ?",
+      [user_id]
+    );
+  },
 };

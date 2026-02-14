@@ -2,40 +2,36 @@ import type { Notification } from "../@types/notification.js";
 import { NotificationModel } from "../models/notification.model.js";
 
 export const NotificationService = {
-	/* ===== EXISTING ===== */
+  getByUser: (user_id: string, query?: any) =>
+    NotificationModel.getByUser(user_id, query),
 
-	getByUser: (user_id: string, query?: any) =>
-		NotificationModel.getByUser(user_id, query),
+  getById: (id: string) =>
+    NotificationModel.getById(id),
 
-	getById: (id: number) =>
-		NotificationModel.getById(id),
+  getAll: () =>
+    NotificationModel.getAll(),
 
-	getAll: () =>
-		NotificationModel.getAll(),
+  create: (data: Partial<Notification>) =>
+    NotificationModel.create(data),
 
-	create: (data: Partial<Notification>) =>
-		NotificationModel.create(data),
+  markAsRead: (id: string) =>
+    NotificationModel.markAsRead(id),
 
-	markAsRead: (id: number) =>
-		NotificationModel.markAsRead(id),
+  delete: (id: string) =>
+    NotificationModel.delete(id),
 
-	delete: (id: number) =>
-		NotificationModel.delete(id),
+  countUnread: (user_id: string) =>
+    NotificationModel.countUnread(user_id),
 
-	countUnread: (user_id: string) =>
-		NotificationModel.countUnread(user_id),
+  markAllAsRead: (user_id: string) =>
+    NotificationModel.markAllAsRead(user_id),
 
-	/* ===== NEW ===== */
+  getUnreadByUser: (user_id: string) =>
+    NotificationModel.getUnreadByUser(user_id),
 
-	markAllAsRead: (user_id: string) =>
-		NotificationModel.markAllAsRead(user_id),
+  bulkMarkAsRead: (ids: string[]) =>
+    NotificationModel.bulkMarkAsRead(ids),
 
-	getUnreadByUser: (user_id: string) =>
-		NotificationModel.getUnreadByUser(user_id),
-
-	bulkMarkAsRead: (ids: number[]) =>
-		NotificationModel.bulkMarkAsRead(ids),
-
-	deleteAllByUser: (user_id: string) =>
-		NotificationModel.deleteAllByUser(user_id),
+  deleteAllByUser: (user_id: string) =>
+    NotificationModel.deleteAllByUser(user_id),
 };
