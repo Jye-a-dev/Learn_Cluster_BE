@@ -6,54 +6,63 @@ import Joi from "joi";
    COMMON UUID RULE
 ========================= */
 const uuidSchema = Joi.string()
-	.guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
-	.required();
+  .guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+  .required();
+
+const optionalUuidSchema = Joi.string()
+  .guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+  .optional()
+  .allow(null);
 
 /* =========================
    CREATE NOTIFICATION
 ========================= */
 export const createNotificationSchema = Joi.object({
-	user_id: uuidSchema,
+  sender_id: optionalUuidSchema, // NULL = system
+  user_id: uuidSchema,
 
-	type: Joi.string().trim().max(50).optional(),
+  type: Joi.string().trim().max(50).optional(),
 
-	content: Joi.string().allow("").optional(),
+  reference_id: optionalUuidSchema,
+  reference_type: Joi.string().trim().max(50).optional(),
+
+  content: Joi.string().allow("").optional(),
 }).options({ abortEarly: false });
 
 /* =========================
    PARAM :notificationId
 ========================= */
 export const notificationIdParamSchema = Joi.object({
-	id: Joi.string()
-		.guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
-		.required(),
+  id: uuidSchema,
 });
 
 /* =========================
    PARAM :user_id
 ========================= */
 export const notificationUserParamSchema = Joi.object({
-	user_id: uuidSchema,
+  user_id: uuidSchema,
 });
 
 /* =========================
    QUERY NOTIFICATIONS
 ========================= */
 export const queryNotificationsSchema = Joi.object({
-	page: Joi.number().integer().min(1).optional(),
-	limit: Joi.number().integer().min(1).max(100).optional(),
+  page: Joi.number().integer().min(1).optional(),
+  limit: Joi.number().integer().min(1).max(100).optional(),
 
-	is_read: Joi.boolean().truthy("true").falsy("false").optional(),
+  is_read: Joi.boolean().truthy("true").falsy("false").optional(),
 
-	type: Joi.string().optional(),
+  type: Joi.string().optional(),
 });
 
 /* =========================
    BULK MARK AS READ
 ========================= */
 export const bulkMarkAsReadSchema = Joi.object({
-	ids: Joi.array()
-		.items(Joi.string().guid({ version: ["uuidv1", "uuidv4", "uuidv5"] }))
-		.min(1)
-		.required(),
+  ids: Joi.array()
+    .items(
+      Joi.string().guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+    )
+    .min(1)
+    .required(),
 });

@@ -42,14 +42,30 @@ export const NotificationModel = {
   },
 
   async create(data: Partial<Notification>): Promise<string> {
-    const { user_id, type, content } = data;
+    const {
+      sender_id,
+      user_id,
+      type,
+      reference_id,
+      reference_type,
+      content,
+    } = data;
 
-    const id = crypto.randomUUID(); // Node 18+
+    const id = crypto.randomUUID();
 
     await pool.query(
-      `INSERT INTO notifications (id, user_id, type, content)
-       VALUES (?, ?, ?, ?)`,
-      [id, user_id, type ?? null, content ?? null]
+      `INSERT INTO notifications
+       (id, sender_id, user_id, type, reference_id, reference_type, content)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        id,
+        sender_id ?? null,        // NULL = system
+        user_id,
+        type ?? null,
+        reference_id ?? null,
+        reference_type ?? null,
+        content ?? null,
+      ]
     );
 
     return id;

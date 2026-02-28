@@ -1,5 +1,13 @@
-import type { Notification } from "../@types/notification.js";
 import { NotificationModel } from "../models/notification.model.js";
+
+type CreateNotificationInput = {
+  sender_id: string | null;
+  user_id: string;
+  type?: string | null;
+  reference_id?: string | null;
+  reference_type?: string | null;
+  content?: string | null;
+};
 
 export const NotificationService = {
   getByUser: (user_id: string, query?: any) =>
@@ -11,8 +19,10 @@ export const NotificationService = {
   getAll: () =>
     NotificationModel.getAll(),
 
-  create: (data: Partial<Notification>) =>
-    NotificationModel.create(data),
+  async create(data: CreateNotificationInput) {
+    // Có thể thêm business rule tại đây
+    return NotificationModel.create(data);
+  },
 
   markAsRead: (id: string) =>
     NotificationModel.markAsRead(id),

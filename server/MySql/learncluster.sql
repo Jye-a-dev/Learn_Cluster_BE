@@ -206,13 +206,17 @@ CREATE TABLE
 CREATE TABLE
   notifications (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    sender_id CHAR(36) NULL,
     user_id CHAR(36) NOT NULL,
     type VARCHAR(50),
+    reference_id CHAR(36) NULL,
+    reference_type VARCHAR(50) NULL,
     content TEXT,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE SET NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-  ) ENGINE = InnoDB;
+  );
 
 CREATE TABLE
   achievements (
