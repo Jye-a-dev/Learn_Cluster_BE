@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { ChapterController } from "../controllers/chapter.controller.js";
-import { createChapterSchema, updateChapterSchema, idParamSchema } from "../validators/chapter.validator.js";
+import { ChapterController } from "../modules/chapter/chapter.controller.js";
+import { createChapterSchema, updateChapterSchema, idParamSchema } from "../modules/chapter/chapter.validator.js";
 import { validateBody, validateParams } from "../middlewares/validate.middleware.js";
 
 const router = Router();

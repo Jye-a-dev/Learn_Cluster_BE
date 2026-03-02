@@ -227,3 +227,40 @@ CREATE TABLE
     awarded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
   ) ENGINE = InnoDB;
+
+--- MATCHING--------------
+CREATE TABLE
+  study_profiles (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    user_id CHAR(36) NOT NULL UNIQUE,
+    bio TEXT,
+    preferred_subject VARCHAR(255),
+    level ENUM ('Beginner', 'Intermediate', 'Advanced'),
+    learning_goal TEXT,
+    available_time JSON,
+    is_active BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+  );
+
+CREATE TABLE
+  study_swipes (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    swiper_id CHAR(36) NOT NULL,
+    target_id CHAR(36) NOT NULL,
+    status ENUM ('pending', 'accepted', 'rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (swiper_id, target_id),
+    FOREIGN KEY (swiper_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (target_id) REFERENCES users (id) ON DELETE CASCADE
+  );
+
+CREATE TABLE
+  study_matches (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    user1_id CHAR(36) NOT NULL,
+    user2_id CHAR(36) NOT NULL,
+    matched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user1_id, user2_id),
+    FOREIGN KEY (user1_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (user2_id) REFERENCES users (id) ON DELETE CASCADE
+  );

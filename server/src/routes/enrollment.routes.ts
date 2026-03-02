@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { EnrollmentController } from "../controllers/enrollment.controller.js";
+import { EnrollmentController } from "../modules/enrollment/enrollment.controller.js";
 import {
   createEnrollmentSchema,
   updateEnrollmentSchema,
   idParamSchema,
   queryEnrollmentsSchema,
-} from "../validators/enrollment.validator.js";
+} from "../modules/enrollment/enrollment.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

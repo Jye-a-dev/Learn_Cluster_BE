@@ -1,7 +1,7 @@
 // src/routes/role.routes.ts
 import { Router } from "express";
-import { RoleController } from "../controllers/role.controller.js";
-import { createRoleSchema, updateRoleSchema, roleIdParamSchema, queryRolesSchema } from "../validators/role.validator.js";
+import { RoleController } from "../modules/role/role.controller.js";
+import { createRoleSchema, updateRoleSchema, roleIdParamSchema, queryRolesSchema } from "../modules/role/role.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

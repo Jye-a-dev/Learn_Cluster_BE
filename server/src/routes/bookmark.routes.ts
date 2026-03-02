@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { BookmarkController } from "../controllers/bookmark.controller.js";
+import { BookmarkController } from "../modules/bookmark/bookmark.controller.js";
 import {
 	createBookmarkSchema,
 	bookmarkIdParamSchema,
@@ -8,7 +8,7 @@ import {
 	userIdParamSchema,
 	lessonIdParamSchema,
 	deleteBookmarkByUserLessonSchema,
-} from "../validators/bookmark.validator.js";
+} from "../modules/bookmark/bookmark.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { NotificationController } from "../controllers/notification.controller.js";
+import { NotificationController } from "../modules/notification/notification.controller.js";
 import {
 	createNotificationSchema,
 	notificationIdParamSchema,
 	notificationUserParamSchema,
 	bulkMarkAsReadSchema,
 	queryNotificationsSchema,
-} from "../validators/notification.validator.js";
+} from "../modules/notification/notification.validator.js";
 import { validateBody, validateParams, validateQuery, validateParamsAndQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

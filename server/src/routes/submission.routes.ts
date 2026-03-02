@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { SubmissionController } from "../controllers/submission.controller.js";
+import { SubmissionController } from "../modules/submission/submission.controller.js";
 import {
 	createSubmissionSchema,
 	updateSubmissionSchema,
@@ -7,7 +7,7 @@ import {
 	assignmentIdParamSchema,
 	studentIdParamSchema,
 	assignmentStudentParamSchema,
-} from "../validators/submission.validator.js";
+} from "../modules/submission/submission.validator.js";
 import { validateBody, validateParams } from "../middlewares/validate.middleware.js";
 
 const router = Router();

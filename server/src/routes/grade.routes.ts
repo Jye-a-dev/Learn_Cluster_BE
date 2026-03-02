@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { GradeController } from "../controllers/grade.controller.js";
+import { GradeController } from "../modules/grade/grade.controller.js";
 import {
 	createGradeSchema,
 	updateGradeSchema,
@@ -7,7 +7,7 @@ import {
 	submissionIdParamSchema,
 	graderIdParamSchema,
 	updateFeedbackSchema,
-} from "../validators/grade.validator.js";
+} from "../modules/grade/grade.validator.js";
 import { validateBody, validateParams } from "../middlewares/validate.middleware.js";
 
 const router = Router();

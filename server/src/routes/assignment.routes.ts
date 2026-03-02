@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { AssignmentController } from "../controllers/assignment.controller.js";
+import { AssignmentController } from "../modules/assigment/assignment.controller.js";
 import {
 	createAssignmentSchema,
 	updateAssignmentSchema,
 	assignmentIdParamSchema,
 	courseIdParamSchema,
 	queryAssignmentsSchema,
-} from "../validators/assignment.validator.js";
+} from "../modules/assigment/assignment.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { CourseInstructorController } from "../controllers/course_instructor.controller.js";
+import { CourseInstructorController } from "../modules/courseInstructor/course_instructor.controller.js";
 import {
 	createCourseInstructorSchema,
 	updateCourseInstructorSchema,
 	idParamSchema,
 	queryCourseInstructorsSchema,
-} from "../validators/course_instructor.validator.js";
+} from "../modules/courseInstructor/course_instructor.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

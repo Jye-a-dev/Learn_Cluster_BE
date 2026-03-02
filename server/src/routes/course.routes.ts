@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { CourseController } from "../controllers/course.controller.js";
-import { createCourseSchema, updateCourseSchema, idParamSchema, queryCoursesSchema } from "../validators/course.validator.js";
+import { CourseController } from "../modules/course/course.controller.js";
+import { createCourseSchema, updateCourseSchema, idParamSchema, queryCoursesSchema } from "../modules/course/course.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

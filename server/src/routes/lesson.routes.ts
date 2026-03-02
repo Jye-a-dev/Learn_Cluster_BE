@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { LessonController } from "../controllers/lesson.controller.js";
-import { createLessonSchema, updateLessonSchema, idParamSchema, chapterIdParamSchema, updateOrderSchema } from "../validators/lesson.validator.js";
+import { LessonController } from "../modules/lesson/lesson.controller.js";
+import { createLessonSchema, updateLessonSchema, idParamSchema, chapterIdParamSchema, updateOrderSchema } from "../modules/lesson/lesson.validator.js";
 import { validateBody, validateParams } from "../middlewares/validate.middleware.js";
 
 const router = Router();

@@ -1,6 +1,6 @@
 // src/routes/note.routes.ts
 import { Router } from "express";
-import { NoteController } from "../controllers/note.controller.js";
+import { NoteController } from "../modules/note/note.controller.js";
 import {
 	createNoteSchema,
 	updateNoteSchema,
@@ -8,7 +8,7 @@ import {
 	queryNotesSchema,
 	noteUserIdParamSchema,
 	noteLessonIdParamSchema,
-} from "../validators/note.validator.js";
+} from "../modules/note/note.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

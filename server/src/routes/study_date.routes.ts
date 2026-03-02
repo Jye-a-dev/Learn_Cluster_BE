@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { StudyDateController } from "../controllers/study_date.controller.js";
-import { createStudyDateSchema, updateStudyDateSchema, idParamSchema, queryStudyDatesSchema, courseIdParamSchema, updateLessonsSchema } from "../validators/study_date.validator.js";
+import { StudyDateController } from "../modules/studyDate/study_date.controller.js";
+import { createStudyDateSchema, updateStudyDateSchema, idParamSchema, queryStudyDatesSchema, courseIdParamSchema, updateLessonsSchema } from "../modules/studyDate/study_date.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

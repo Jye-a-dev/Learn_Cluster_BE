@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { PermissionController } from "../controllers/permission.controller.js";
-import { createPermissionSchema, updatePermissionSchema, idParamSchema, queryPermissionSchema } from "../validators/permission.validator.js";
+import { PermissionController } from "../modules/permission/permission.controller.js";
+import { createPermissionSchema, updatePermissionSchema, idParamSchema, queryPermissionSchema } from "../modules/permission/permission.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();

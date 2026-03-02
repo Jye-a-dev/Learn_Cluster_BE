@@ -1,8 +1,8 @@
 // src/routes/study_date_participant.routes.ts
 import { Router } from "express";
-import { StudyDateParticipantController } from "../controllers/study_date_participant.controller.js";
+import { StudyDateParticipantController } from "../modules/studyDateParticipant/study_date_participant.controller.js";
 import { validateBody, validateParams } from "../middlewares/validate.middleware.js";
-import { studyDateIdParamSchema, userIdParamSchema, studyDateUserParamSchema, joinStudyDateSchema } from "../validators/study_date_participant.validator.js";
+import { studyDateIdParamSchema, userIdParamSchema, studyDateUserParamSchema, joinStudyDateSchema } from "../modules/studyDateParticipant/study_date_participant.validator.js";
 
 const router = Router();
 

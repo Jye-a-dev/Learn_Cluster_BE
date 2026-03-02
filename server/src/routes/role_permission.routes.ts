@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { RolePermissionController } from "../controllers/role_permission.controller.js";
+import { RolePermissionController } from "../modules/rolePermisson/role_permission.controller.js";
 import {
 	addRolePermissionSchema,
 	removeRolePermissionSchema,
@@ -8,7 +8,7 @@ import {
 	permissionParamSchema,
 	putRolePermissionSchema,
 	patchRolePermissionSchema,
-} from "../validators/role_permission.validator.js";
+} from "../modules/rolePermisson/role_permission.validator.js";
 import { validateBody, validateParams } from "../middlewares/validate.middleware.js";
 
 const router = Router();

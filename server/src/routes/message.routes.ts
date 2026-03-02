@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { MessageController } from "../controllers/message.controller.js";
-import { createMessageSchema, updateMessageSchema, messageIdParamSchema, messageStudyDateParamSchema } from "../validators/message.validator.js";
+import { MessageController } from "../modules/message/message.controller.js";
+import { createMessageSchema, updateMessageSchema, messageIdParamSchema, messageStudyDateParamSchema } from "../modules/message/message.validator.js";
 import { validateBody, validateParams } from "../middlewares/validate.middleware.js";
 
 const router = Router();

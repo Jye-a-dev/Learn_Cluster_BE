@@ -1,6 +1,6 @@
 // src/routes/achievement.routes.ts
 import { Router } from "express";
-import { AchievementController } from "../controllers/achievement.controller.js";
+import { AchievementController } from "../modules/achievement/achievement.controller.js";
 import {
 	createAchievementSchema,
 	updateAchievementSchema,
@@ -8,7 +8,7 @@ import {
 	achievementIdParamSchema,
 	userIdParamSchema,
 	queryAchievementsSchema,
-} from "../validators/achievement.validator.js";
+} from "../modules/achievement/achievement.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();
