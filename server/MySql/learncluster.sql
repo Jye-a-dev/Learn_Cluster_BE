@@ -264,3 +264,48 @@ CREATE TABLE
     FOREIGN KEY (user1_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (user2_id) REFERENCES users (id) ON DELETE CASCADE
   );
+
+---- Payment---------
+CREATE TABLE
+  plans (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    duration_days INT NULL, -- null nếu mua vĩnh viễn
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  ) ENGINE = InnoDB;
+
+CREATE TABLE
+  orders (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    user_id CHAR(36) NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status ENUM ('pending', 'paid', 'failed', 'cancelled') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
+
+CREATE TABLE
+  order_items (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    order_id CHAR(36) NOT NULL,
+    item_type ENUM ('course', 'plan') NOT NULL,
+    item_id CHAR(36) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
+
+CREATE TABLE
+  payments (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID ()),
+    order_id CHAR(36) NOT NULL,
+    provider VARCHAR(50), -- momo, stripe, vnpay
+    transaction_code VARCHAR(255),
+    amount DECIMAL(10, 2),
+    status ENUM ('pending', 'success', 'failed') DEFAULT 'pending',
+    paid_at DATETIME NULL,
+    raw_response JSON,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB;
