@@ -36,31 +36,17 @@ export const StudyProfileModel = {
 	},
 
 	async getById(id: string): Promise<StudyProfile | null> {
-		const [rows] = await pool.query(
-			"SELECT * FROM study_profiles WHERE id = ?",
-			[id]
-		);
+		const [rows] = await pool.query("SELECT * FROM study_profiles WHERE id = ?", [id]);
 		return (rows as StudyProfile[])[0] || null;
 	},
 
 	async getByUserId(user_id: string): Promise<StudyProfile | null> {
-		const [rows] = await pool.query(
-			"SELECT * FROM study_profiles WHERE user_id = ?",
-			[user_id]
-		);
+		const [rows] = await pool.query("SELECT * FROM study_profiles WHERE user_id = ?", [user_id]);
 		return (rows as StudyProfile[])[0] || null;
 	},
 
 	async create(data: Partial<StudyProfile>): Promise<string> {
-		const {
-			user_id,
-			bio,
-			preferred_subject,
-			level,
-			learning_goal,
-			available_time,
-			is_active,
-		} = data;
+		const { user_id, bio, preferred_subject, level, learning_goal, available_time, is_active } = data;
 
 		const [result] = await pool.query(
 			`INSERT INTO study_profiles 
@@ -74,27 +60,34 @@ export const StudyProfileModel = {
 				learning_goal || null,
 				available_time ? JSON.stringify(available_time) : null,
 				is_active ?? true,
-			]
+			],
 		);
 
 		return (result as any).insertId;
 	},
 
 	async update(id: string, data: Partial<StudyProfile>): Promise<void> {
-		if (data.available_time) {
-			data.available_time = JSON.stringify(data.available_time);
+		const clone: any = {};
+
+		for (const key in data) {
+			if (data[key as keyof StudyProfile] !== undefined) {
+				clone[key] = data[key as keyof StudyProfile];
+			}
 		}
 
-		const fields = Object.keys(data)
+		if ("available_time" in clone) {
+			clone.available_time = clone.available_time !== null ? JSON.stringify(clone.available_time) : null;
+		}
+
+		const fields = Object.keys(clone)
 			.map((k) => `${k} = ?`)
 			.join(", ");
 
-		const values = Object.values(data);
+		if (!fields) return;
 
-		await pool.query(
-			`UPDATE study_profiles SET ${fields} WHERE id = ?`,
-			[...values, id]
-		);
+		const values = Object.values(clone);
+
+		await pool.query(`UPDATE study_profiles SET ${fields} WHERE id = ?`, [...values, id]);
 	},
 
 	async delete(id: string): Promise<void> {
@@ -102,9 +95,7 @@ export const StudyProfileModel = {
 	},
 
 	async count(): Promise<number> {
-		const [rows] = await pool.query(
-			"SELECT COUNT(*) as total FROM study_profiles"
-		);
+		const [rows] = await pool.query("SELECT COUNT(*) as total FROM study_profiles");
 		return (rows as any)[0].total || 0;
 	},
 };
