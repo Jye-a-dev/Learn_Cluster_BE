@@ -2,71 +2,107 @@
 import type { Request, Response } from "express";
 import { UserService } from "../user/user.service.js";
 import jwt from "jsonwebtoken";
+
 export const UserController = {
+
+
+	/* ================= USERS ================= */
+
 	async getAll(req: Request, res: Response) {
 		try {
-			console.log("validatedQuery:", (req as any).validatedQuery);
 			const query = (req as any).validatedQuery;
 			const users = await UserService.getAll(query);
 			res.json(users || []);
-		} catch (err) {
-			console.error("getAll error:", err);
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+		} catch {
+			res.status(500).json({ message: "Server error" });
 		}
 	},
 
 	async getById(req: Request, res: Response) {
 		try {
-			console.log("validatedParams:", (req as any).validatedParams);
-			const params = (req as any).validatedParams;
-			const id = params?.id;
-			if (!id) return res.status(400).json({ message: "Yêu cầu User ID" });
+			const id = (req as any).validatedParams?.id;
+			if (!id) return res.status(400).json({ message: "User ID required" });
 
 			const user = await UserService.getById(id);
-			if (!user) return res.status(404).json({ message: "Không thấy user" });
+
+			if (!user) {
+				return res.status(404).json({ message: "User not found" });
+			}
 
 			res.json(user);
-		} catch (err) {
-			console.error("getById error:", err);
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+		} catch {
+			res.status(500).json({ message: "Server error" });
 		}
 	},
 
 	async getFullById(req: Request, res: Response) {
 		try {
-			const params = (req as any).validatedParams;
-			const id = params?.id;
-			if (!id) return res.status(400).json({ message: "Yêu cầu User ID" });
+			const id = (req as any).validatedParams?.id;
+
+			if (!id) {
+				return res.status(400).json({ message: "User ID required" });
+			}
 
 			const user = await UserService.getFullById(id);
-			if (!user) return res.status(404).json({ message: "Không thấy user" });
+
+			if (!user) {
+				return res.status(404).json({ message: "User not found" });
+			}
 
 			res.json(user);
-		} catch (err) {
-			console.error("getFullById error:", err);
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+		} catch {
+			res.status(500).json({ message: "Server error" });
 		}
 	},
 
 	async count(req: Request, res: Response) {
 		try {
-			const total = await UserService.count();
-			res.json({ total });
-		} catch (err) {
-			console.error("count error:", err);
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+			const count = await UserService.count();
+
+			res.json({
+				count,
+			});
+		} catch {
+			res.status(500).json({ message: "Server error" });
+		}
+	},
+
+	async getByRole(req: Request, res: Response) {
+		try {
+			const role_id = (req as any).validatedParams?.role_id;
+
+			const users = await UserService.getByRole(role_id);
+
+			res.json(users || []);
+		} catch {
+			res.status(500).json({ message: "Server error" });
+		}
+	},
+
+	async countByRole(req: Request, res: Response) {
+		try {
+			const role_id = (req as any).validatedParams?.role_id;
+
+			const count = await UserService.countByRole(role_id);
+
+			res.json({
+				role_id,
+				count,
+			});
+		} catch {
+			res.status(500).json({ message: "Server error" });
 		}
 	},
 
 	async create(req: Request, res: Response) {
 		try {
-			console.log("validatedBody:", (req as any).validatedBody);
 			const body = (req as any).validatedBody;
+
 			const id = await UserService.create(body);
+
 			res.status(201).json({ id });
-		} catch (err) {
-			console.error("create error:", err);
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+		} catch {
+			res.status(500).json({ message: "Server error" });
 		}
 	},
 
@@ -74,82 +110,48 @@ export const UserController = {
 		try {
 			const params = (req as any).validatedParams;
 			const body = (req as any).validatedBody;
+
 			const id = params?.id;
-			if (!id) return res.status(400).json({ message: "Yêu cầu User ID" });
 
-			// update user
-			const updatedUser = await UserService.update(id, body);
-
-			// 👉 nếu role được update & user đang login chính là user đó
-			const currentUser = (req as any).user;
-
-			if (
-				body.role && // có update role
-				currentUser?.userId === Number(id) // update chính mình
-			) {
-				const newToken = jwt.sign(
-					{
-						userId: currentUser.userId,
-						role: body.role,
-					},
-					process.env.JWT_SECRET!,
-					{ expiresIn: "7d" },
-				);
-
-				res.cookie("access_token", newToken, {
-					httpOnly: true,
-					secure: false,
-					sameSite: "lax",
-					maxAge: 7 * 24 * 60 * 60 * 1000,
-				});
+			if (!id) {
+				return res.status(400).json({ message: "User ID required" });
 			}
 
+			await UserService.update(id, body);
+
 			res.json({ message: "User updated" });
-		} catch (err) {
-			console.error("update error:", err);
-			res.status(500).json({ message: "Server error", error: err });
+		} catch {
+			res.status(500).json({ message: "Server error" });
 		}
 	},
+
 	async delete(req: Request, res: Response) {
 		try {
-			const params = (req as any).validatedParams;
-			const id = params?.id;
-			if (!id) return res.status(400).json({ message: "Yêu cầu User ID" });
+			const id = (req as any).validatedParams?.id;
+
+			if (!id) {
+				return res.status(400).json({ message: "User ID required" });
+			}
 
 			await UserService.delete(id);
-			res.json({ message: "User deleted" });
-		} catch (err) {
-			console.error("delete error:", err);
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
-		}
-	},
-	async getByRole(req: Request, res: Response) {
-		try {
-			const role_id = (req as any).validatedParams?.role_id;
-			const users = await UserService.getByRole(role_id);
-			res.json(users || []);
-		} catch (err) {
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
-		}
-	},
 
-	async countByRole(req: Request, res: Response) {
-		try {
-			const role_id = (req as any).validatedParams?.role_id;
-			const total = await UserService.countByRole(role_id);
-			res.json({ total });
-		} catch (err) {
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+			res.json({
+				message: "User deleted",
+			});
+		} catch {
+			res.status(500).json({ message: "Server error" });
 		}
 	},
 
 	async search(req: Request, res: Response) {
 		try {
 			const q = (req as any).validatedQuery?.q;
+
 			const users = await UserService.search(q);
+
 			res.json(users || []);
-		} catch (err) {
-			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
+		} catch {
+			res.status(500).json({ message: "Server error" });
 		}
 	},
 };

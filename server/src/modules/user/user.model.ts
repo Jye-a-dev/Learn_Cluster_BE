@@ -3,6 +3,7 @@ import type { User } from "../user/user.d.ts";
 import { db as pool } from "../../config/db.js";
 
 const DEFAULT_ROLE_ID = "879d3f96-ebd2-11f0-b513-acf23c8aac4e";
+
 export const UserModel = {
 	async getAll(): Promise<User[]> {
 		const [rows] = await pool.query("SELECT * FROM users");
@@ -11,6 +12,21 @@ export const UserModel = {
 
 	async getById(id: string): Promise<User | null> {
 		const [rows] = await pool.query("SELECT * FROM users WHERE id = ?", [id]);
+		return (rows as User[])[0] || null;
+	},
+
+	// 🔹 thêm: lấy user theo email (cần cho Google login)
+	async getByEmail(email: string): Promise<User | null> {
+		const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
+		return (rows as User[])[0] || null;
+	},
+
+	// 🔹 thêm: lấy user theo google_id
+	async getByGoogleId(google_id: string): Promise<User | null> {
+		const [rows] = await pool.query(
+			"SELECT * FROM users WHERE google_id = ?",
+			[google_id]
+		);
 		return (rows as User[])[0] || null;
 	},
 
@@ -36,7 +52,7 @@ export const UserModel = {
 	async create(user: Partial<User>): Promise<string> {
 		const { username, email, password_hash } = user;
 
-		const [result] = await pool.query(
+		await pool.query(
 			`
     INSERT INTO users (username, email, password_hash, role_id)
     VALUES (?, ?, ?, ?)
@@ -44,7 +60,43 @@ export const UserModel = {
 			[username, email, password_hash, DEFAULT_ROLE_ID],
 		);
 
-		return (result as any).insertId;
+		// ⚠ UUID table nên phải query lại
+		const [rows] = await pool.query(
+			"SELECT id FROM users WHERE email = ?",
+			[email]
+		);
+
+		return (rows as any[])[0]?.id;
+	},
+
+	// 🔹 thêm: tạo user bằng Google
+	async createGoogleUser(data: {
+		username: string;
+		email: string;
+		password_hash: string;
+		google_id: string;
+	}): Promise<string> {
+
+		await pool.query(
+			`
+      INSERT INTO users (username, email, password_hash, google_id, role_id)
+      VALUES (?, ?, ?, ?, ?)
+      `,
+			[
+				data.username,
+				data.email,
+				data.password_hash,
+				data.google_id,
+				DEFAULT_ROLE_ID,
+			],
+		);
+
+		const [rows] = await pool.query(
+			"SELECT id FROM users WHERE email = ?",
+			[data.email]
+		);
+
+		return (rows as any[])[0]?.id;
 	},
 
 	async update(id: string, data: Partial<User>): Promise<User | null> {
@@ -55,7 +107,6 @@ export const UserModel = {
 
 		await pool.query(`UPDATE users SET ${fields} WHERE id = ?`, [...values, id]);
 
-		// ⬅️ lấy user mới sau update
 		const [rows] = await pool.query(
 			`
     SELECT u.*, r.name AS role_name
@@ -77,19 +128,29 @@ export const UserModel = {
 		const [rows] = await pool.query("SELECT COUNT(*) as total FROM users");
 		return (rows as any)[0].total || 0;
 	},
-	async getByRole(role_id: number): Promise<User[]> {
-		const [rows] = await pool.query("SELECT * FROM users WHERE role_id = ?", [role_id]);
+
+	async getByRole(role_id: string): Promise<User[]> {
+		const [rows] = await pool.query(
+			"SELECT * FROM users WHERE role_id = ?",
+			[role_id]
+		);
 		return rows as User[];
 	},
 
-	async countByRole(role_id: number): Promise<number> {
-		const [rows] = await pool.query("SELECT COUNT(*) as total FROM users WHERE role_id = ?", [role_id]);
+	async countByRole(role_id: string): Promise<number> {
+		const [rows] = await pool.query(
+			"SELECT COUNT(*) as total FROM users WHERE role_id = ?",
+			[role_id]
+		);
 		return (rows as any)[0].total || 0;
 	},
 
 	async search(q: string): Promise<User[]> {
 		const like = `%${q}%`;
-		const [rows] = await pool.query("SELECT * FROM users WHERE username LIKE ? OR email LIKE ?", [like, like]);
+		const [rows] = await pool.query(
+			"SELECT * FROM users WHERE username LIKE ? OR email LIKE ?",
+			[like, like],
+		);
 		return rows as User[];
 	},
 };
