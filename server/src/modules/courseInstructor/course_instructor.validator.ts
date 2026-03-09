@@ -51,3 +51,7 @@ export const queryCourseInstructorsSchema = Joi.object({
 		.valid("Teacher", "TA", "Moderator")
 		.optional(),
 });
+
+export const userIdParamSchema = Joi.object({
+  user_id: Joi.string().uuid().required(),
+});

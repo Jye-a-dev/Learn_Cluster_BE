@@ -5,6 +5,7 @@ import {
 	updateCourseInstructorSchema,
 	idParamSchema,
 	queryCourseInstructorsSchema,
+	userIdParamSchema,
 } from "../modules/courseInstructor/course_instructor.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
@@ -30,8 +31,7 @@ router.delete("/:id", validateParams(idParamSchema), CourseInstructorController.
 router.get("/course/:course_id", CourseInstructorController.getByCourse);
 
 // ===== BY USER =====
-router.get("/user/:user_id", CourseInstructorController.getByUser);
-
+router.get("/user/:user_id", validateParams(userIdParamSchema), CourseInstructorController.getByUser);
 // ===== FULL INFO =====
 router.get("/course/:course_id/full", CourseInstructorController.getFullByCourse);
 
