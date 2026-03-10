@@ -77,4 +77,22 @@ export const EnrollmentController = {
 			res.status(500).json({ message: "Server error", error: err instanceof Error ? err.message : err });
 		}
 	},
+	async countStudentByCourse(req: Request, res: Response) {
+		try {
+			const course_id = (req as any).validatedParams?.course_id;
+
+			if (!course_id) {
+				return res.status(400).json({ message: "Yêu cầu course_id" });
+			}
+
+			const total = await EnrollmentService.countStudentByCourse(course_id);
+
+			res.json({ course_id, total });
+		} catch (err) {
+			res.status(500).json({
+				message: "Server error",
+				error: err instanceof Error ? err.message : err,
+			});
+		}
+	},
 };

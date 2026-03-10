@@ -55,3 +55,9 @@ export const queryCourseInstructorsSchema = Joi.object({
 export const userIdParamSchema = Joi.object({
   user_id: Joi.string().uuid().required(),
 });
+
+export const courseIdParamSchema = Joi.object({
+  course_id: Joi.string()
+    .guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+    .required(),
+});

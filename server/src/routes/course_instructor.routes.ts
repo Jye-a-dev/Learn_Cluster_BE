@@ -6,6 +6,7 @@ import {
 	idParamSchema,
 	queryCourseInstructorsSchema,
 	userIdParamSchema,
+	courseIdParamSchema,
 } from "../modules/courseInstructor/course_instructor.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
@@ -17,6 +18,8 @@ router.get("/", validateQuery(queryCourseInstructorsSchema), CourseInstructorCon
 // ===== GET BY ID =====
 router.get("/:id", validateParams(idParamSchema), CourseInstructorController.getById);
 
+//=============Count========
+router.get("/count/:course_id",CourseInstructorController.countByCourse)
 // ===== CREATE =====
 router.post("/", validateBody(createCourseInstructorSchema), CourseInstructorController.create);
 
@@ -28,8 +31,11 @@ router.patch("/:id", validateParams(idParamSchema), validateBody(updateCourseIns
 router.delete("/:id", validateParams(idParamSchema), CourseInstructorController.delete);
 
 // ===== BY COURSE =====
-router.get("/course/:course_id", CourseInstructorController.getByCourse);
-
+router.get(
+  "/course/:course_id",
+  validateParams(courseIdParamSchema),
+  CourseInstructorController.getByCourse
+);
 // ===== BY USER =====
 router.get("/user/:user_id", validateParams(userIdParamSchema), CourseInstructorController.getByUser);
 // ===== FULL INFO =====

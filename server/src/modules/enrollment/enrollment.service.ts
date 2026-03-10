@@ -10,7 +10,7 @@ export const EnrollmentService = {
 	update: (id: number, data: Partial<Enrollment>) => EnrollmentModel.update(id, data),
 	delete: (id: number) => EnrollmentModel.delete(id),
 	count: () => EnrollmentModel.count(),
+	countStudentByCourse: (course_id: number) => EnrollmentModel.countStudentByCourse(course_id),
 	countFiltered: (user_id?: string, course_id?: number) => EnrollmentModel.countFiltered(user_id, course_id),
-	getFiltered: (options: { user_id?: string; course_id?: number; page?: number; limit?: number }) =>
-		EnrollmentModel.getFiltered(options),
+	getFiltered: (options: { user_id?: string; course_id?: number; page?: number; limit?: number }) => EnrollmentModel.getFiltered(options),
 };

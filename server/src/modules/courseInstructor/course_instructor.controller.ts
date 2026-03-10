@@ -8,9 +8,27 @@ export const CourseInstructorController = {
 			const instructors = await CourseInstructorService.getAll();
 			res.json(instructors);
 		} catch (error: any) {
-			res
-				.status(500)
-				.json({ message: "Lỗi khi lấy danh sách course instructors", error: error.message });
+			res.status(500).json({ message: "Lỗi khi lấy danh sách course instructors", error: error.message });
+		}
+	},
+	// ===== COUNT BY COURSE =====
+	async countByCourse(req: Request, res: Response) {
+		try {
+			const { course_id } = req.params;
+
+			if (!course_id) return res.status(400).json({ message: "Yêu cầu Course ID" });
+
+			const total = await CourseInstructorService.countByCourse(course_id);
+
+			res.json({
+				course_id,
+				total_instructors: total,
+			});
+		} catch (error: any) {
+			res.status(500).json({
+				message: "Lỗi khi đếm instructors của course",
+				error: error.message,
+			});
 		}
 	},
 
@@ -21,14 +39,11 @@ export const CourseInstructorController = {
 			if (!id) return res.status(400).json({ message: "Yêu cầu ID" });
 
 			const instructor = await CourseInstructorService.getById(id);
-			if (!instructor)
-				return res.status(404).json({ message: "Không thấy course instructor" });
+			if (!instructor) return res.status(404).json({ message: "Không thấy course instructor" });
 
 			res.json(instructor);
 		} catch (error: any) {
-			res
-				.status(500)
-				.json({ message: "Lỗi khi lấy course instructor", error: error.message });
+			res.status(500).json({ message: "Lỗi khi lấy course instructor", error: error.message });
 		}
 	},
 
@@ -36,15 +51,12 @@ export const CourseInstructorController = {
 	async getByCourse(req: Request, res: Response) {
 		try {
 			const { course_id } = (req as any).validatedParams;
-			if (!course_id)
-				return res.status(400).json({ message: "Yêu cầu Course ID" });
+			if (!course_id) return res.status(400).json({ message: "Yêu cầu Course ID" });
 
 			const instructors = await CourseInstructorService.getByCourse(course_id);
 			res.json(instructors);
 		} catch (error: any) {
-			res
-				.status(500)
-				.json({ message: "Lỗi khi lấy instructors theo course", error: error.message });
+			res.status(500).json({ message: "Lỗi khi lấy instructors theo course", error: error.message });
 		}
 	},
 
@@ -52,15 +64,12 @@ export const CourseInstructorController = {
 	async getByUser(req: Request, res: Response) {
 		try {
 			const { user_id } = (req as any).validatedParams;
-			if (!user_id)
-				return res.status(400).json({ message: "Yêu cầu User ID" });
+			if (!user_id) return res.status(400).json({ message: "Yêu cầu User ID" });
 
 			const courses = await CourseInstructorService.getByUser(user_id);
 			res.json(courses);
 		} catch (error: any) {
-			res
-				.status(500)
-				.json({ message: "Lỗi khi lấy course theo user", error: error.message });
+			res.status(500).json({ message: "Lỗi khi lấy course theo user", error: error.message });
 		}
 	},
 
@@ -68,11 +77,9 @@ export const CourseInstructorController = {
 	async getFullByCourse(req: Request, res: Response) {
 		try {
 			const { course_id } = (req as any).validatedParams;
-			if (!course_id)
-				return res.status(400).json({ message: "Yêu cầu Course ID" });
+			if (!course_id) return res.status(400).json({ message: "Yêu cầu Course ID" });
 
-			const instructors =
-				await CourseInstructorService.getFullByCourse(course_id);
+			const instructors = await CourseInstructorService.getFullByCourse(course_id);
 			res.json(instructors);
 		} catch (error: any) {
 			res.status(500).json({
@@ -88,9 +95,7 @@ export const CourseInstructorController = {
 			await CourseInstructorService.create(req.body);
 			res.status(201).json({ message: "Course instructor created" });
 		} catch (error: any) {
-			res
-				.status(500)
-				.json({ message: "Lỗi khi tạo course instructor", error: error.message });
+			res.status(500).json({ message: "Lỗi khi tạo course instructor", error: error.message });
 		}
 	},
 
@@ -105,9 +110,7 @@ export const CourseInstructorController = {
 
 			res.json({ message: "Course instructor updated" });
 		} catch (error: any) {
-			res
-				.status(500)
-				.json({ message: "Lỗi khi cập nhật role instructor", error: error.message });
+			res.status(500).json({ message: "Lỗi khi cập nhật role instructor", error: error.message });
 		}
 	},
 
@@ -120,9 +123,7 @@ export const CourseInstructorController = {
 			await CourseInstructorService.delete(id);
 			res.json({ message: "Course instructor deleted" });
 		} catch (error: any) {
-			res
-				.status(500)
-				.json({ message: "Lỗi khi xóa course instructor", error: error.message });
+			res.status(500).json({ message: "Lỗi khi xóa course instructor", error: error.message });
 		}
 	},
 
@@ -130,8 +131,7 @@ export const CourseInstructorController = {
 	async deleteByCourse(req: Request, res: Response) {
 		try {
 			const { course_id } = (req as any).validatedParams;
-			if (!course_id)
-				return res.status(400).json({ message: "Yêu cầu Course ID" });
+			if (!course_id) return res.status(400).json({ message: "Yêu cầu Course ID" });
 
 			await CourseInstructorService.deleteByCourse(course_id);
 			res.json({ message: "Deleted all instructors of course" });

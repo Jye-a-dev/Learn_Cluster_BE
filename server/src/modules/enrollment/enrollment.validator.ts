@@ -24,3 +24,9 @@ export const queryEnrollmentsSchema = Joi.object({
   user_id: Joi.string().guid({ version: ["uuidv1","uuidv4", "uuidv5"] }).optional(),
   course_id: Joi.string().guid({ version: ["uuidv1","uuidv4", "uuidv5"] }).optional(),
 });
+
+export const courseIdParamSchema = Joi.object({
+  course_id: Joi.string()
+    .guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+    .required(),
+});

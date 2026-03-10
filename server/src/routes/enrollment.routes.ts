@@ -1,11 +1,6 @@
 import { Router } from "express";
 import { EnrollmentController } from "../modules/enrollment/enrollment.controller.js";
-import {
-  createEnrollmentSchema,
-  updateEnrollmentSchema,
-  idParamSchema,
-  queryEnrollmentsSchema,
-} from "../modules/enrollment/enrollment.validator.js";
+import { createEnrollmentSchema, updateEnrollmentSchema, idParamSchema, queryEnrollmentsSchema, courseIdParamSchema } from "../modules/enrollment/enrollment.validator.js";
 import { validateBody, validateParams, validateQuery } from "../middlewares/validate.middleware.js";
 
 const router = Router();
@@ -15,7 +10,7 @@ router.get("/", validateQuery(queryEnrollmentsSchema), EnrollmentController.getF
 
 // GET /api/enrollment/count (có filter)
 router.get("/count", validateQuery(queryEnrollmentsSchema), EnrollmentController.count);
-
+router.get("/count_students/:course_id", validateParams(courseIdParamSchema), EnrollmentController.countStudentByCourse);
 // GET /api/enrollment/:id
 router.get("/:id", validateParams(idParamSchema), EnrollmentController.getById);
 
