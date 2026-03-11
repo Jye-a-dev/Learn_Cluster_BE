@@ -44,7 +44,7 @@ app.use(logger);
 // =======================
 app.set("view engine", "ejs");
 app.set("views", path.join(process.cwd(), "src/views"));
-
+console.log("SERVER FILE:", import.meta.url);
 // =======================
 // ROUTES
 // =======================
@@ -75,4 +75,5 @@ app.listen(PORT, () => {
   console.log(`🧩  View Engine: EJS`);
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("");
+  console.log("SERVER RESTART", Date.now());
 });

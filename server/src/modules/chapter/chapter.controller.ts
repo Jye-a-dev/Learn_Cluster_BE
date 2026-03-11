@@ -33,6 +33,7 @@ export const ChapterController = {
   async getByCourse(req: Request, res: Response) {
     try {
       const { course_id } = (req as any).validatedParams;
+      console.log("validatedParams:", (req as any).validatedParams);
       const chapters = await ChapterService.getByCourse(course_id);
       res.json(chapters || []);
     } catch (err) {

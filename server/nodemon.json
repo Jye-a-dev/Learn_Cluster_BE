@@ -2,5 +2,6 @@
   "watch": ["src"],
   "ext": "ts,json",
   "ignore": ["dist", "node_modules"],
-  "exec": "node --loader ts-node/esm src/server.ts"
+  "exec": "node --loader ts-node/esm ./src/server.ts",
+  "delay": "200"
 }

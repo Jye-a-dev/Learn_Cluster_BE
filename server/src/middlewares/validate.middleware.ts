@@ -8,6 +8,7 @@ import type { Schema } from "joi";
 const validate = (schema: Schema, source: "body" | "params" | "query") => {
 	return (req: Request, res: Response, next: NextFunction) => {
 		const data = req[source];
+
 		const { error, value } = schema.validate(data, {
 			abortEarly: false,
 			stripUnknown: true,
@@ -20,11 +21,10 @@ const validate = (schema: Schema, source: "body" | "params" | "query") => {
 			});
 		}
 
-		(req as any)[`validated${source.charAt(0).toUpperCase() + source.slice(1)}`] = value;
+		req[source] = value;   // quan trọng
 		next();
 	};
 };
-
 /* =========================
    EXPORT SHORTCUTS
 ========================= */

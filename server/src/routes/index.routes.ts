@@ -1,67 +1,73 @@
 import { Router } from "express";
+import { routesConfig } from "./routes.config.js";
 import path from "path";
-import fs from "fs";
 import { pathToFileURL } from "url";
 
 const router = Router();
-const routesPath = path.resolve("./src/routes");
 const routeList: string[] = [];
 
-// Hàm lấy danh sách route từ router
-function extractRoutes(r: any, prefix: string) {
-	const result: { methods: string; path: string }[] = [];
-	r.stack?.forEach((layer: any) => {
-		if (layer.route) {
+const routesPath = path.join(process.cwd(), "src", "routes");
+
+function extractRoutes(router: any, prefix: string) {
+	const routes: { methods: string; path: string }[] = [];
+
+	router.stack?.forEach((layer: any) => {
+		if (layer.route && layer.route.path) {
 			const methods = Object.keys(layer.route.methods)
 				.map((m) => m.toUpperCase())
 				.join(", ");
-			result.push({
+
+			routes.push({
 				methods,
 				path: prefix + layer.route.path,
 			});
 		}
 	});
-	return result;
+
+	return routes;
 }
 
-// Đọc tất cả file trong routes
-fs.readdirSync(routesPath).forEach((file) => {
-	if (file === "index.routes.ts") return;
-	if (!file.endsWith(".ts") && !file.endsWith(".js")) return;
+async function loadRoutes() {
+	for (const r of routesConfig) {
+		const routeName = r.name;
+		routeList.push(routeName);
 
-	const routeName = file.replace(/\.(ts|js)$/, "").replace(".routes", "");
-	routeList.push(routeName);
+		try {
+			const fullPath = path.join(routesPath, r.file);
 
-	const fullPath = path.join(routesPath, file);
+			console.log("📥 Importing", fullPath);
+			const module = await import(pathToFileURL(fullPath).href + `?t=${Date.now()}`);
 
-	import(pathToFileURL(fullPath).href)
-		.then((module) => {
-			const apiRouter = module.default?.default || module.default;
-			if (!apiRouter?.stack) return;
+			const apiRouter = module.default;
+			if (!apiRouter?.stack) {
+				console.log(`⚠ ${routeName} không phải router`);
+				continue;
+			}
 
-			// Redirect auth HTML sang user HTML
 			if (routeName === "auth") {
 				router.get("/api/auth/html", (req, res) => {
 					res.redirect("/api/user/html");
 				});
-				// Không mount HTML khác cho auth
+
 				router.use(`/api/${routeName}`, apiRouter);
-				console.log(`✔ /api/${routeName} → ${file} (redirect HTML to /api/user/html)`);
-				return;
+
+				console.log(`✔ Mounted /api/${routeName} (redirect HTML)`);
+				continue;
 			}
 
-			// Mount HTML route trước cho các route dạng bảng
 			router.get(`/api/${routeName}/html`, async (req, res) => {
 				try {
 					const response = await fetch(`http://localhost:3000/api/${routeName}`);
 					const data = await response.json();
+
 					const columns = Array.isArray(data) && data.length ? Object.keys(data[0]) : [];
+
 					const apiRoutes = extractRoutes(apiRouter, `/api/${routeName}`);
 
 					res.render("data", {
 						title: routeName.toUpperCase(),
 						columns,
-						data: Array.isArray(data) ? data : [], // chắc chắn là array
+						data: Array.isArray(data) ? data : [],
 						apiRoutes,
 					});
 				} catch {
@@ -74,15 +80,17 @@ fs.readdirSync(routesPath).forEach((file) => {
 				}
 			});
 
-			// Mount API JSON bình thường
 			router.use(`/api/${routeName}`, apiRouter);
 
-			console.log(`✔ /api/${routeName} → ${file}`);
-		})
-		.catch(console.error);
-});
+			console.log(`✔ Mounted /api/${routeName}`);
+		} catch (err) {
+			console.error(`❌ Error loading ${routeName}`, err);
+		}
+	}
+}
 
-// Trang index hiển thị danh sách route
+await loadRoutes();
+
 router.get("/", (req, res) => {
 	res.render("index", { routes: routeList });
 });
