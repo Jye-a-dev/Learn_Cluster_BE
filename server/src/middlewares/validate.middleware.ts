@@ -1,15 +1,10 @@
-// src/middlewares/validate.middleware.ts
 import type { Request, Response, NextFunction } from "express";
 import type { Schema } from "joi";
 
-/* =========================
-   GENERIC VALIDATE HELPER
-========================= */
 const validate = (schema: Schema, source: "body" | "params" | "query") => {
 	return (req: Request, res: Response, next: NextFunction) => {
-		const data = req[source];
 
-		const { error, value } = schema.validate(data, {
+		const { error, value } = schema.validate(req[source], {
 			abortEarly: false,
 			stripUnknown: true,
 		});
@@ -21,27 +16,37 @@ const validate = (schema: Schema, source: "body" | "params" | "query") => {
 			});
 		}
 
-		req[source] = value;   // quan trọng
+		if (source === "body") {
+			req.body = value;
+			(req as any).validatedBody = value;
+		}
+
+		if (source === "params") {
+			Object.assign(req.params, value);
+			(req as any).validatedParams = value;
+		}
+
+		if (source === "query") {
+			Object.assign(req.query, value);
+			(req as any).validatedQuery = value;
+		}
+
 		next();
 	};
 };
-/* =========================
-   EXPORT SHORTCUTS
-========================= */
+
 export const validateBody = (schema: Schema) => validate(schema, "body");
 export const validateParams = (schema: Schema) => validate(schema, "params");
 export const validateQuery = (schema: Schema) => validate(schema, "query");
-
-/* =========================
-   VALIDATE MULTIPLE (PARAMS + QUERY)
-========================= */
 export const validateParamsAndQuery =
 	(paramsSchema: Schema, querySchema: Schema) =>
 	(req: Request, res: Response, next: NextFunction) => {
+
 		const paramsResult = paramsSchema.validate(req.params, {
 			abortEarly: false,
 			stripUnknown: true,
 		});
+
 		if (paramsResult.error) {
 			return res.status(400).json({
 				message: "Validation params thất bại",
@@ -53,6 +58,7 @@ export const validateParamsAndQuery =
 			abortEarly: false,
 			stripUnknown: true,
 		});
+
 		if (queryResult.error) {
 			return res.status(400).json({
 				message: "Validation query thất bại",
@@ -60,7 +66,11 @@ export const validateParamsAndQuery =
 			});
 		}
 
+		Object.assign(req.params, paramsResult.value);
+		Object.assign(req.query, queryResult.value);
+
 		(req as any).validatedParams = paramsResult.value;
 		(req as any).validatedQuery = queryResult.value;
+
 		next();
 	};
