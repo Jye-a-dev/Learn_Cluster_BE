@@ -19,8 +19,4 @@ router.patch("/id/:id", validateParams(idParamSchema), validateBody(updateChapte
 
 router.delete("/id/:id", validateParams(idParamSchema), ChapterController.delete);
 
-console.log(
-	"Chapter routes:",
-	router.stack.map((r: any) => r.route?.path),
-);
 export default router;
