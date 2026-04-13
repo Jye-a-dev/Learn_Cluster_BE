@@ -5,7 +5,7 @@ export const StudyDateParticipantController = {
             const { study_date_id } = req.validatedParams;
             if (!study_date_id)
                 return res.status(400).json({ message: "Yêu cầu StudyDate ID" });
-            const participants = await StudyDateParticipantService.getByStudyDate(Number(study_date_id));
+            const participants = await StudyDateParticipantService.getByStudyDate(study_date_id);
             res.json(participants || []);
         }
         catch (err) {
@@ -40,7 +40,7 @@ export const StudyDateParticipantController = {
             const { study_date_id } = req.validatedParams;
             if (!study_date_id)
                 return res.status(400).json({ message: "Yêu cầu StudyDate ID" });
-            const total = await StudyDateParticipantService.countByStudyDate(Number(study_date_id));
+            const total = await StudyDateParticipantService.countByStudyDate(study_date_id);
             res.json({ total });
         }
         catch (err) {
@@ -81,7 +81,7 @@ export const StudyDateParticipantController = {
     async checkJoined(req, res) {
         try {
             const { study_date_id, user_id } = req.validatedParams;
-            const joined = await StudyDateParticipantService.exists(Number(study_date_id), user_id);
+            const joined = await StudyDateParticipantService.exists(study_date_id, user_id);
             res.json({ joined });
         }
         catch (err) {
@@ -91,7 +91,7 @@ export const StudyDateParticipantController = {
     async kick(req, res) {
         try {
             const { study_date_id, user_id } = req.validatedParams;
-            await StudyDateParticipantService.removeByStudyDateAndUser(Number(study_date_id), user_id);
+            await StudyDateParticipantService.removeByStudyDateAndUser(study_date_id, user_id);
             res.json({ message: "Removed participant" });
         }
         catch (err) {

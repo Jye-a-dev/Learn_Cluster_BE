@@ -3,17 +3,17 @@ import type { StudyDateParticipant } from "../studyDateParticipant/types.js";
 import { db as pool } from "../../config/db.js";
 
 export const StudyDateParticipantModel = {
-	async getByStudyDate(study_date_id: number): Promise<StudyDateParticipant[]> {
+	async getByStudyDate(study_date_id: string): Promise<StudyDateParticipant[]> {
 		const [rows] = await pool.query("SELECT * FROM study_date_participants WHERE study_date_id = ?", [study_date_id]);
 		return rows as StudyDateParticipant[];
 	},
 
-	async join(study_date_id: number, user_id: string): Promise<number> {
+	async join(study_date_id: string, user_id: string): Promise<number> {
 		const [result] = await pool.query("INSERT INTO study_date_participants (study_date_id, user_id) VALUES (?, ?)", [study_date_id, user_id]);
 		return (result as any).insertId;
 	},
 
-	async leave(study_date_id: number, user_id: string): Promise<void> {
+	async leave(study_date_id: string, user_id: string): Promise<void> {
 		await pool.query("DELETE FROM study_date_participants WHERE study_date_id = ? AND user_id = ?", [study_date_id, user_id]);
 	},
 	async getAll(): Promise<StudyDateParticipant[]> {
@@ -21,7 +21,7 @@ export const StudyDateParticipantModel = {
 		return rows as StudyDateParticipant[];
 	},
 
-	async countByStudyDate(study_date_id: number): Promise<number> {
+	async countByStudyDate(study_date_id: string): Promise<number> {
 		const [rows] = await pool.query("SELECT COUNT(*) as total FROM study_date_participants WHERE study_date_id = ?", [study_date_id]);
 		return (rows as any)[0].total || 0;
 	},
@@ -36,12 +36,12 @@ export const StudyDateParticipantModel = {
 		return (rows as any)[0].total || 0;
 	},
 
-	async exists(study_date_id: number, user_id: string): Promise<boolean> {
+	async exists(study_date_id: string, user_id: string): Promise<boolean> {
 		const [rows] = await pool.query("SELECT 1 FROM study_date_participants WHERE study_date_id = ? AND user_id = ? LIMIT 1", [study_date_id, user_id]);
 		return (rows as any[]).length > 0;
 	},
 
-	async removeByStudyDateAndUser(study_date_id: number, user_id: string): Promise<void> {
+	async removeByStudyDateAndUser(study_date_id: string, user_id: string): Promise<void> {
 		await pool.query("DELETE FROM study_date_participants WHERE study_date_id = ? AND user_id = ?", [study_date_id, user_id]);
 	},
 };
