@@ -1,0 +1,72 @@
+import Joi from "joi";
+/* ===== CREATE USER ===== */
+export const createUserSchema = Joi.object({
+    username: Joi.string().min(3).max(50).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+});
+/* ===== UPDATE USER ===== */
+export const updateUserSchema = Joi.object({
+    username: Joi.string().min(3).max(50).optional(),
+    email: Joi.string().email().optional(),
+    password_hash: Joi.string().min(6).optional(),
+    role_id: Joi.string()
+        .guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+        .optional()
+        .allow(null),
+}).min(1);
+/* ===== GET USER BY ID / DELETE USER ===== */
+export const idParamSchema = Joi.object({
+    id: Joi.string()
+        .guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+        .required(),
+});
+/* ===== QUERY USERS ===== */
+export const queryUsersSchema = Joi.object({
+    page: Joi.number().integer().min(1).optional(),
+    limit: Joi.number().integer().min(1).max(100).optional(),
+    search: Joi.string().optional().allow(""),
+    role_id: Joi.string()
+        .guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+        .optional()
+        .allow(null),
+});
+export const roleParamSchema = Joi.object({
+    role_id: Joi.string()
+        .guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+        .required(),
+});
+export const searchUserSchema = Joi.object({
+    q: Joi.string().min(1).required(),
+});
+/* ===== AUTH ===== */
+export const loginSchema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+});
+export const registerSchema = Joi.object({
+    username: Joi.string().min(3).max(50).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+    role_id: Joi.string()
+        .guid({ version: ["uuidv1", "uuidv4", "uuidv5"] })
+        .optional()
+        .allow(null),
+});
+/* ===== GOOGLE LOGIN ===== */
+export const googleLoginSchema = Joi.object({
+    google_id: Joi.string().required(),
+    email: Joi.string().email().required(),
+    name: Joi.string().min(1).required(),
+});
+/* ===== VALIDATION FUNCTION ===== */
+export function validateSchema(schema, data) {
+    const { error, value } = schema.validate(data, {
+        abortEarly: false,
+        stripUnknown: true,
+    });
+    if (error) {
+        throw new Error(error.details.map((d) => d.message).join(", "));
+    }
+    return value;
+}

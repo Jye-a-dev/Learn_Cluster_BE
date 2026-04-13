@@ -1,0 +1,15 @@
+import { Router } from "express";
+import { StudyMatchController } from "../studyMatch/controller.js";
+import { createStudyMatchSchema, studyMatchIdParamSchema, queryStudyMatchSchema } from "../studyMatch/validators.js";
+import { validateBody, validateParams, validateQuery } from "../../middlewares/validate.middleware.js";
+
+const router = Router();
+
+router.get("/", validateQuery(queryStudyMatchSchema), StudyMatchController.getAll);
+router.get("/count", StudyMatchController.count);
+router.get("/id/:id", validateParams(studyMatchIdParamSchema), StudyMatchController.getById);
+
+router.post("/", validateBody(createStudyMatchSchema), StudyMatchController.create);
+router.delete("/id/:id", validateParams(studyMatchIdParamSchema), StudyMatchController.delete);
+
+export default router;

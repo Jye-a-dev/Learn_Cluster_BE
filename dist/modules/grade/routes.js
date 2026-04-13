@@ -1,0 +1,22 @@
+import { Router } from "express";
+import { GradeController } from "../grade/controller.js";
+import { createGradeSchema, updateGradeSchema, idParamSchema, submissionIdParamSchema, graderIdParamSchema, updateFeedbackSchema, } from "../grade/validators.js";
+import { validateBody, validateParams } from "../../middlewares/validate.middleware.js";
+const router = Router();
+// ===== EXISTING ROUTES =====
+router.get("/", GradeController.getAll);
+router.get("/count", GradeController.count);
+router.get("/id/:id", validateParams(idParamSchema), GradeController.getById);
+router.post("/", validateBody(createGradeSchema), GradeController.create);
+router.put("/id/:id", validateParams(idParamSchema), validateBody(updateGradeSchema), GradeController.update);
+router.delete("/id/:id", validateParams(idParamSchema), GradeController.delete);
+// ===== NEW/EXTRA ROUTES =====
+// Get all grades by submission
+router.get("/submission/:submission_id", validateParams(submissionIdParamSchema), GradeController.getBySubmission);
+// Get all grades by grader
+router.get("/grader/:grader_id", validateParams(graderIdParamSchema), GradeController.getByGrader);
+// Update feedback only
+router.patch("/:id/feedback", validateParams(idParamSchema), validateBody(updateFeedbackSchema), GradeController.updateFeedback);
+// Get top N grades
+router.get("/top/:n", GradeController.getTop);
+export default router;

@@ -1,0 +1,13 @@
+import { Router } from "express";
+import { PermissionController } from "../permission/controller.js";
+import { createPermissionSchema, updatePermissionSchema, idParamSchema, queryPermissionSchema } from "../permission/validators.js";
+import { validateBody, validateParams, validateQuery } from "../../middlewares/validate.middleware.js";
+const router = Router();
+router.get("/", validateQuery(queryPermissionSchema), PermissionController.getAll);
+router.get("/count", PermissionController.count);
+router.get("/id/:id", validateParams(idParamSchema), PermissionController.getById);
+router.post("/", validateBody(createPermissionSchema), PermissionController.create);
+router.put("/id/:id", validateParams(idParamSchema), validateBody(updatePermissionSchema), PermissionController.update);
+router.patch("/id/:id", validateParams(idParamSchema), validateBody(updatePermissionSchema), PermissionController.update);
+router.delete("/id/:id", validateParams(idParamSchema), PermissionController.delete);
+export default router;
